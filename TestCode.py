@@ -1,4 +1,6 @@
 import gymnasium as gym
+from PIL import Image
+from matplotlib import pyplot as plt
 env = gym.make("ALE/Breakout-v5", render_mode="human")
 observation, info = env.reset()
 
@@ -6,9 +8,12 @@ for _ in range(100):
     action = 1  # agent policy that uses the observation and info
     observation, reward, terminated, truncated, info = env.step(action)
 
+plt.imshow(observation)
+plt.show()
+
 # Define the height and width of the screen and the lower limit of the screen we want to search
 screen_height, screen_width, _ = env.observation_space.shape
-bottom_half = screen_height // 2
+bottom_half = 90
 
 # Define the color threshold for the red pixels
 red_threshold = 150
@@ -23,6 +28,10 @@ for row in range(bottom_half, screen_height):
 
 # Print the coordinates of the red pixels
 print(red_pixels)
+
+print(env.observation_space)
+print(env.action_space)
+
 for _ in range(1000):
     action = 1  # agent policy that uses the observation and info
     observation, reward, terminated, truncated, info = env.step(action)
