@@ -6,10 +6,14 @@ def abstract_state(state):
     # Define a mapping of real state to abstract state
     # In this example, we create a 10x10 grid on the screen and
     # map each pixel to a grid cell
-    grid_size = 10
-    screen_width = 160
+    gridW = 18
+    gridH = 6
+    pxlStartW = 8
+    pxlStartH = 93
+    pxlEndW = 152
+    pxlEndH = 116
     screen_height = 210
-    cell_width = screen_width // grid_size
+    cell_width = screen_width // gridW
     cell_height = screen_height // grid_size
 
     # Get the position of the ball and paddle in the real state
