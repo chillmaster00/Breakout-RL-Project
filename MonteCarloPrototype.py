@@ -4,33 +4,72 @@ import numpy as np
 
 def abstract_state(state):
     # Define a mapping of real state to abstract state
-    # In this example, we create a 10x10 grid on the screen and
-    # map each pixel to a grid cell
-    gridW = 18
-    gridH = 6
-    pxlStartW = 8
-    pxlStartH = 93
-    pxlEndW = 152
-    pxlEndH = 116
-    screen_height = 210
-    cell_width = screen_width // gridW
-    cell_height = screen_height // grid_size
+    # Here, we discretize the blank space between the
+    # wall and the paddle as an 16 row by 18 column grid
+    cellHeight = 6
+    cellWidth = 8
+    gridX = 18
+    gridY = 16
 
-    # Get the position of the ball and paddle in the real state
-    ball_x, ball_y = state[0][0], state[0][1]
-    paddle_x, _ = state[1][0], state[1][1]
+    stateGrid = np.zeros((gridX, gridY))
 
-    # Map the ball and paddle positions to grid cells
-    ball_cell_x = ball_x // cell_width
-    ball_cell_y = ball_y // cell_height
-    paddle_cell_x = paddle_x // cell_width
+    # Define start and end of discretization space
+    startX = 8
+    startY = 93
+    endX = 152
+    endY = 188
 
-    # Combine the ball and paddle positions into a single abstract state
-    abstract_state = ball_cell_x * grid_size**2 + ball_cell_y * grid_size + paddle_cell_x
+
+    for _ in range(100):
+        action = env.action_space.sample()  # agent policy that uses the observation and info
+        observation, reward, terminated, truncated, info = env.step(action)
+
+    # Define the height and width of the screen and the lower limit of the screen we want to search
+    screen_height, screen_width, _ = env.observation_space.shape
+
+
+    # Define the color threshold for the red pixels
+    red_threshold = 150
+
+    # Loop through the bottom half of the screen and
+    # find the red pixels in the ball area
+    red_pixels = []
+    for x in range(startX, endX):
+        for y in range(startY, endY):
+            pixel_color = observation[y][x][:]
+            if pixel_color[0] > red_threshold:
+                red_pixels.append((x, y))
+    ballX = 0
+    ballY = 0
+    paddleX = 0
+    # Calculate grid position of ball
+    if (len(red_pixels) > 0):
+        ballX = int((red_pixels[0][0] - startX) / cellWidth)
+        ballY = int((red_pixels[0][1] - startY) / cellHeight)
+
+    # Loop through the bottom half of the screen and
+    # find the red pixels in the paddle area
+    red_pixels = []
+    for x in range(startX, endX):
+        for y in range(endY, screen_height):
+            pixel_color = observation[y][x][:]
+            if pixel_color[0] > red_threshold:
+                red_pixels.append((x, y))
+
+    # Calculate grid position of ball
+    if (len(red_pixels) > 0):
+        paddleX = int((red_pixels[0][0] - startX) / cellWidth)
+
+    print("Ball is in grid position: (", ballX, ", ", ballY, ")")
+    print("Paddle is in position ",paddleX)
+
+    abstract_state = ballX, ballY, paddleX 
 
     return abstract_state
 
-def monte_carlo_policy_evaluation(env, policy, gamma, num_episodes):
+    
+
+def monte_carlo_policy_evaluation(env, gamma, num_episodes):
     returns = defaultdict(list)
     values = defaultdict(float)
     for i in range(num_episodes):
@@ -38,43 +77,52 @@ def monte_carlo_policy_evaluation(env, policy, gamma, num_episodes):
         state = env.reset()
         terminated = False
         truncated = False
-        while not terminated or truncated:
-            action = policy(state)
-            next_state, reward, terminated, truncated, _ = env.step(action)
+        lives = 6
+        info = {'lives': 5}
+        while not (terminated or truncated):
+            action = 2
+            if info['lives'] != lives:
+                # Fire the ball with action 1
+                action = 1
+                lives = info['lives']
+
+            next_state, reward, terminated, truncated, info = env.step(action)
             state = abstract_state(state)
             episode.append((state, action, reward))
             state = next_state
-            env.step(1)
         G = 0
+        print(episode)
         for t in reversed(range(len(episode))):
             state, action, reward = episode[t]
             G = gamma * G + reward
-            if state not in [x[0] for x in episode[0:t]]:
-                if state in returns:
-                    returns[state].append(G)
-                else:
+            for t2 in range (t):
+                if t2 != t:
                     returns[state] = [G]
-                values[state] = np.mean(returns[state])
+                    values[state] = np.mean(returns[state])
     return values
 
 # Define the policy function
-def policy(state):
+def policy(state, values, epsilon):
     """
-    A simple policy for the Breakout game.
+    A policy for the Breakout game that becomes more greedy as the value function becomes more accurate.
 
     :param state: The current state of the game.
+    :param values: The value function for the current policy.
+    :param epsilon: The exploration rate.
     :return: The action to take.
     """
-    if np.random.uniform() < 0.5:
-        return 2 
+    if np.random.rand() < epsilon:
+        return np.random.choice([0, 2, 3])
     else:
-        return 3
+        actions = [0, 2, 3]
+        q_values = [values.get((state, a), 0) for a in actions]
+        return actions[np.argmax(q_values)]
 
 # Create the environment
 env = gym.make("ALE/Breakout-v5", render_mode="human")
 
 # Evaluate the policy using the Monte Carlo method
-values = monte_carlo_policy_evaluation(env, policy, 0.99, 1000)
+values = monte_carlo_policy_evaluation(env, 0.99, 1000)
 
 # Print the values for some example states
 print('Value for state (10, 20, 1):', values[(10, 20, 1)])

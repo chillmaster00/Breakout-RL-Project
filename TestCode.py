@@ -25,6 +25,7 @@ endY = 188
 for _ in range(100):
     action = env.action_space.sample()  # agent policy that uses the observation and info
     observation, reward, terminated, truncated, info = env.step(action)
+    print(info['lives'])
 
 # Define the height and width of the screen and the lower limit of the screen we want to search
 screen_height, screen_width, _ = env.observation_space.shape
