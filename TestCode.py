@@ -1,8 +1,26 @@
 import gymnasium as gym
 from PIL import Image
 from matplotlib import pyplot as plt
+import numpy as np
 env = gym.make("ALE/Breakout-v5", render_mode="human")
 observation, info = env.reset()
+
+# Define a mapping of real state to abstract state
+# Here, we discretize the blank space between the
+# wall and the paddle as an 16 row by 18 column grid
+cellHeight = 6
+cellWidth = 8
+gridX = 18
+gridY = 16
+
+stateGrid = np.zeros((gridX, gridY))
+
+# Define start and end of discretization space
+startX = 8
+startY = 93
+endX = 152
+endY = 188
+
 
 for _ in range(100):
     action = env.action_space.sample()  # agent policy that uses the observation and info
@@ -14,7 +32,6 @@ plt.show()
 
 # Define the height and width of the screen and the lower limit of the screen we want to search
 screen_height, screen_width, _ = env.observation_space.shape
-bottom_half = 90
 
 
 # Define the color threshold for the red pixels
@@ -22,14 +39,22 @@ red_threshold = 150
 
 # Loop through the bottom half of the screen and find the red pixels
 red_pixels = []
-for row in range(bottom_half, screen_height):
-    for col in range(screen_width):
-        pixel_color = observation[row][col][:]
+for x in range(startX, endX):
+    for y in range(startY, endY):
+        pixel_color = observation[y][x][:]
         if pixel_color[0] > red_threshold:
-            red_pixels.append((row, col))
+            red_pixels.append((x, y))
+
+# Calculate grid position of ball
+ballX = int((red_pixels[0][0] - startX) / cellWidth)
+ballY = int((red_pixels[0][1] - startY) / cellHeight)
+
+print("Ball is in grid position: (", ballX, ", ", ballY, ")")
 
 # Print the coordinates of the red pixels
 print(red_pixels)
+plt.imshow(observation)
+plt.show()
 
 print(reward)
 print(env.observation_space)
