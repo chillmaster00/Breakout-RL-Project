@@ -44,6 +44,7 @@ for x in range(startX, endX):
             red_pixels.append((x, y))
 
 # Calculate grid position of ball
+ballX, ballY = 0, 0
 if (len(red_pixels) > 0):
     ballX = int((red_pixels[0][0] - startX) / cellWidth)
     ballY = int((red_pixels[0][1] - startY) / cellHeight)
@@ -58,6 +59,7 @@ for x in range(startX, endX):
             red_pixels.append((x, y))
 
 # Calculate grid position of ball
+paddleX = 0
 if (len(red_pixels) > 0):
     paddleX = int((red_pixels[0][0] - startX) / cellWidth)
 
