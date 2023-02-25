@@ -4,6 +4,10 @@
 # Purpose
 #   Performs TD learning on Atari's Breakout 2600
 
+# Explanation of data structures used
+#   state is a tuple of (ball_x, ball_y, paddle_x)
+#   sa_values is a dictionary indexed by (state, action)
+
 from collections import defaultdict
 import gymnasium as gym
 import numpy as np
@@ -12,25 +16,30 @@ from tqdm import tqdm
 
 
 # Constant Variables
+    # Determine pixel dimensions for each grid cell
 cell_height = 6
 cell_width = 8
 
+    # Determine bounds of the area of interst for the ball
 start_x = 8
 end_x = 152
 start_y = 93
 end_y = 188
 
+    # Determine defaults used in the discretize_state method
 def_pos = -1
 red_threshold = 150
 
-def_action_val = 1000 # guarantees each action for each state is tried at least once
+    # Determine what value to default to if one is not present
+    # A higher default action value encourages more exploration
+    #   at the start
+def_action_val = 0
 
 
 # Given the environment and the state returned
-# by .step(), return a tuple of the discretized
-# grid position of the ball and paddle
+#   by .step(), return a tuple of the discretized
+#   grid position of the ball and paddle
 def discretize_state(env, state):
-    # TODO, check to see if it works
     # Default positions of ball and paddle
     ball_x, ball_y = def_pos, def_pos
     paddle_x = def_pos
@@ -49,7 +58,7 @@ def discretize_state(env, state):
             break
 
     # Loop through the remaining bottom half of the screen
-    # and find the position of the paddle
+    #   and find the position of the paddle
     screenH, screenW, _ = env.observation_space.shape
 
     for x in range(start_x, end_x):
@@ -66,38 +75,66 @@ def discretize_state(env, state):
     return (ball_x, ball_y, paddle_x)
 
 
-# Return a policy action according to e-greedy
-def get_e_greedy_action(sa_values, state, epsilon):
-    # TODO, check to see if this works
-    # Check for exploration and, if so, return a random action
-    # Note for actions:
-    #   0 - do nothing
-    #   1 - fire (spawns a ball if ball is gone)
-    #   2 - move paddle to the left
-    #   3 - move paddle to the right
-    if np.random.rand() < epsilon:
-        return np.random.choice([0, 2, 3])
-    
-    # Pick the best action
-    action_values = []
-    best_action, best_action_val = 0, -1
-    for a in [0, 2, 3]:
-        # Variables
-        sa_pair = (state, a)
-        curr_action_val = -1
+# Get the state-action value, returning the
+#   
+def get_sa_value(sa_values, state, action):
+    sa_pair = (state, action)
+    curr_action_val = -1
 
-        # Find a value for the state-action pair
-        if (sa_pair) in sa_values:
-            curr_action_val = sa_values[sa_pair]
-        else:
-            curr_action_val = def_action_val
-        
+    if (sa_pair) in sa_values:
+        return sa_values[sa_pair]
+    else:
+        return def_action_val
+
+
+# Get the best action given the state
+def get_best_action(sa_values, state):
+    best_action, best_action_val = 0, -1
+
+    # For each valid action, figure out which is best
+    for a in [0, 2, 3]:
+        curr_action_val = get_sa_value(sa_values, state, a)
+
         # Determine the best action
         if curr_action_val > best_action_val:
             best_action, best_action_val = a, curr_action_val
-        
-
+            
     return best_action
+
+
+# Return a policy action according to e-greedy
+def get_e_greedy_action(sa_values, state, epsilon):
+    # Check for exploration and, if so, return a random action
+    if np.random.rand() < epsilon:
+        return np.random.choice([0, 2, 3])
+    
+    # Otherwise, get the best action for the state
+    return get_best_action(sa_values, state)
+
+
+# Updates the state-action pair value
+def update_state_action_values(sa_values, alpha, gamma, curr_state, curr_action, next_state, next_reward):
+    # Variables
+    sa_pair = (curr_state, curr_action)
+    td_error = 0
+    td_target = 0
+
+    # Calculate how much the increment is
+    next_state_best_action = get_best_action(sa_values, next_state)
+
+    td_target = next_reward
+    td_target += gamma * get_sa_value(sa_values, next_state, next_state_best_action)
+    
+    td_error = td_target - get_sa_value(sa_values, curr_state, curr_action)
+    #   Note: can't use sa_values directly in case
+    #       the sa_pair hasn't been met before
+
+    # Update the state-action value
+    sa_values[sa_pair] = get_sa_value(sa_values, curr_state, curr_action) # to get the default action val if needed
+    sa_values[sa_pair] += alpha*td_error
+
+
+    return 0
 
 
 
