@@ -3,7 +3,7 @@ import gymnasium as gym
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-
+from gym.wrappers import TimeLimit
 
 
 def abstract_state(state):
@@ -31,27 +31,23 @@ def abstract_state(state):
     red_threshold = 150
     # Loop through the bottom half of the screen and
     # find the red pixels in the ball area
-    red_pixels = []
     for x in range(startX, endX):
         for y in range(startY, endY):
             pixel_color = state[y][x][0]
             if pixel_color > red_threshold:
-                red_pixels.append((x, y))
+                ballX = int((x - startX) / cellWidth)
+                ballY = int((y - startY) / cellHeight)
                 break
 
-    # Calculate grid position of ball
-    if (len(red_pixels) > 0):
-        ballX = int((red_pixels[0][0] - startX) / cellWidth)
-        ballY = int((red_pixels[0][1] - startY) / cellHeight)
 
     # Loop through the bottom half of the screen and
     # find the red pixels in the paddle area
     red_pixels = []
     for x in range(startX, endX):
         for y in range(endY, screen_height):
-            pixel_color = state[y][x][:]
-            if pixel_color[0] > red_threshold:
-                red_pixels.append((x, y))
+            pixel_color = state[y][x][0]
+            if pixel_color > red_threshold:
+                paddleX = int((x - startX) / cellWidth)
                 break
 
     # Calculate grid position of ball
@@ -74,6 +70,10 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
     for i in tqdm(range(num_episodes)):
         episode = []
         returns = defaultdict(list)
+        epsilon_min = 0.05
+        epsilon_max = 1.0
+        epsilon_decay = 100
+        eps = max(epsilon_min, epsilon_max - (epsilon_max - epsilon_min) * i / epsilon_decay)
 
 
         state = env.reset()
@@ -90,7 +90,8 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
         lives = info['lives']
 
         while not (terminated or truncated):
-            action = policy(aState, values, 1/(i+1))
+            eps = max(epsilon_min, epsilon_max - (epsilon_max - epsilon_min) * i / epsilon_decay)
+            action = policy(aState, values, eps)
             if info['lives'] != lives:
                 # Fire the ball with action 1
                 action = 1
@@ -111,7 +112,7 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
                 for a in range (3):
                     if t2 != t:
                         if a != action:
-                            returns[state, action] = [G]
+                            returns[state, action].append(G)
                             values[state, action] = np.mean(returns[state, action])
         training_data.append((i,tG))
     return values, training_data
@@ -134,10 +135,10 @@ def policy(state, values, epsilon):
         return actions[np.argmax(q_values)]
 
 # Create the environment
-env = gym.make("ALE/Breakout-v5")
-
+env = gym.make("ALE/Breakout-v5", render_mode="human")
+env = TimeLimit(env, max_episode_steps=10000)
 # Evaluate the policy using the Monte Carlo method
-values, tData = monte_carlo_policy_evaluation(env, 0.90, 1000)
+values, tData = monte_carlo_policy_evaluation(env, 0.25, 100)
 
 # assume that your training data is a list of (episode, reward) tuples
 
