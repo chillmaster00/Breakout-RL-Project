@@ -20,24 +20,19 @@ def abstract_state(state):
     endY = 188
 
 
-    for _ in range(100):
-        action = env.action_space.sample()  # agent policy that uses the observation and info
-        observation, reward, terminated, truncated, info = env.step(action)
-
     # Define the height and width of the screen and the lower limit of the screen we want to search
     screen_height, screen_width, _ = env.observation_space.shape
 
 
     # Define the color threshold for the red pixels
     red_threshold = 150
-
     # Loop through the bottom half of the screen and
     # find the red pixels in the ball area
     red_pixels = []
     for x in range(startX, endX):
         for y in range(startY, endY):
-            pixel_color = observation[y][x][:]
-            if pixel_color[0] > red_threshold:
+            pixel_color = state[y][x][0]
+            if pixel_color > red_threshold:
                 red_pixels.append((x, y))
     ballX = 0
     ballY = 0
@@ -52,7 +47,7 @@ def abstract_state(state):
     red_pixels = []
     for x in range(startX, endX):
         for y in range(endY, screen_height):
-            pixel_color = observation[y][x][:]
+            pixel_color = state[y][x][:]
             if pixel_color[0] > red_threshold:
                 red_pixels.append((x, y))
 
@@ -77,8 +72,10 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
         state = env.reset()
         terminated = False
         truncated = False
-        lives = 6
-        info = {'lives': 5}
+        lives = 5
+        next_state, reward, terminated, truncated, info = env.step(1)
+        lives = info['lives']
+        state = next_state
         while not (terminated or truncated):
             action = 2
             if info['lives'] != lives:
@@ -122,9 +119,8 @@ def policy(state, values, epsilon):
 env = gym.make("ALE/Breakout-v5", render_mode="human")
 
 # Evaluate the policy using the Monte Carlo method
-values = monte_carlo_policy_evaluation(env, 0.99, 1000)
+values = monte_carlo_policy_evaluation(env, 0.99, 10)
 
 # Print the values for some example states
-print('Value for state (10, 20, 1):', values[(10, 20, 1)])
-print('Value for state (50, 100, 2):', values[(50, 100, 2)])
-print('Value for state (100, 150, 0):', values[(100, 150, 0)])
+print('Value for state (10, 20, 1):', values)
+
