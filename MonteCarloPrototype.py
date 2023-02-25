@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from gym.wrappers import TimeLimit
+import pickle
 
 
 def abstract_state(state):
@@ -68,8 +69,16 @@ def abstract_state(state):
     
 
 def monte_carlo_policy_evaluation(env, gamma, num_episodes):
-    values = defaultdict(float)
     training_data = []
+
+    # Read the saved value from a file (if it exists)
+    try:
+        with open('my_dict.pkl', 'rb') as f:
+            values = pickle.load(f)
+    except FileNotFoundError:
+        values = defaultdict(float)
+
+    print(values)
 
     for i in tqdm(range(num_episodes)):
         episode = []
@@ -119,6 +128,11 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
                             returns[state, action].append(G)
                             values[state, action] = np.mean(returns[state, action])
         training_data.append((i,tG))
+
+    # save the dictionary to a file using pickle.dump
+    with open('my_dict.pkl', 'wb') as f:
+        pickle.dump(values, f)
+
     return values, training_data
 
 # Define the policy function
@@ -142,7 +156,7 @@ def policy(state, values, epsilon):
 env = gym.make("ALE/Breakout-v5")
 env = TimeLimit(env, max_episode_steps=1000)
 # Evaluate the policy using the Monte Carlo method
-values, tData = monte_carlo_policy_evaluation(env, 0.99, 1000)
+values, tData = monte_carlo_policy_evaluation(env, 0.99, 10)
 
 # assume that your training data is a list of (episode, reward) tuples
 
