@@ -141,12 +141,16 @@ def update_state_action_values(sa_values, alpha, gamma, curr_state, action, next
 def run_td_learning(num_episodes, alpha, gamma, epsilon):
     # Variables
     sa_values = defaultdict(float)
-    
+    episode_rewards = []
+
     # Create the environment
     env = gym.make("ALE/Breakout-v5")
 
     # Run episodes of TD Learning
     for episode in tqdm(range(num_episodes)):
+        # Variables
+        episode_reward = 0
+
         # Reset the environment
         env.reset()
 
@@ -156,8 +160,9 @@ def run_td_learning(num_episodes, alpha, gamma, epsilon):
 
         # Start game by launching ball (Action 1)
         game_state, reward, terminated, truncated, info = env.step(1)
-        curr_state = discretize_state(game_state)
+        curr_state = discretize_state(env, game_state)
         next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
+        episode_reward += reward
 
         # Get lives
         lives = info['lives']
@@ -166,23 +171,36 @@ def run_td_learning(num_episodes, alpha, gamma, epsilon):
         while not (terminated or truncated):
             # Get the next game state
             game_state, reward, terminated, truncated, info = env.step(next_action)
-            next_state = discretize_state(game_state)
+            next_state = discretize_state(env, game_state)
+            episode_reward += reward
 
             # Update the state-action values
             update_state_action_values(sa_values, alpha, gamma, curr_state, next_action, next_state, reward)
             curr_state = next_state
             next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
 
-            # If a life is lost, the ball needs to be fired
-            if info['lives'] != lives:
+            # If a life is lost or the ball is not visible,
+            #   try to fire the ball (action 1)
+            if (info['lives'] != lives) or (curr_state[0] == def_pos and curr_state[1] == def_pos):
                 game_state, reward, terminated, truncated, info = env.step(1)
                 lives = info['lives']
+                episode_reward += reward
 
-            
-
-
-    return sa_values
+        episode_rewards.append(episode_reward)
 
 
 
-run_td_learning(100, 0.10, 0.90, 0.10)
+    return sa_values, episode_rewards
+
+
+
+sa_values, episode_rewards = run_td_learning(1000, 0.10, 0.90, 0.10)
+print(sa_values)
+print(episode_rewards)
+
+plt.plot(range(0,1000), episode_rewards)
+plt.xlabel("Episodes")
+plt.ylabel("Rewards")
+plt.title("Reward over Episodes")
+plt.show()
+
