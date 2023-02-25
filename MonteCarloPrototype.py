@@ -69,16 +69,27 @@ def abstract_state(state):
     
 
 def monte_carlo_policy_evaluation(env, gamma, num_episodes):
-    training_data = []
 
-    # Read the saved value from a file (if it exists)
+    # Read the saved values and training data from a file (if it exists)
     try:
-        with open('my_dict.pkl', 'rb') as f:
+        with open('training.pkl', 'rb') as f:
+            training_data = pickle.load(f)
+    except FileNotFoundError:
+        training_data = []
+    try:
+        with open('values.pkl', 'rb') as f:
             values = pickle.load(f)
     except FileNotFoundError:
         values = defaultdict(float)
+    try:
+        with open('epOffset.pkl', 'rb') as f:
+            epOffset = pickle.load(f)
+    except FileNotFoundError:
+        epOffset = 0
 
     print(values)
+    print(training_data)
+    print(epOffset)
 
     for i in tqdm(range(num_episodes)):
         episode = []
@@ -127,11 +138,16 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
                         if a != action:
                             returns[state, action].append(G)
                             values[state, action] = np.mean(returns[state, action])
-        training_data.append((i,tG))
+        training_data.append((i + epOffset,tG))
 
-    # save the dictionary to a file using pickle.dump
-    with open('my_dict.pkl', 'wb') as f:
+    epOffset = len(training_data)
+    # save the files to a file using pickle.dump
+    with open('values.pkl', 'wb') as f:
         pickle.dump(values, f)
+    with open('training.pkl', 'wb') as f:
+        pickle.dump(training_data, f)
+    with open('epOffset.pkl', 'wb') as f:
+        pickle.dump(epOffset, f)
 
     return values, training_data
 
