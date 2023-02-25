@@ -11,8 +11,8 @@ def abstract_state(state):
     # Define a mapping of real state to abstract state
     # Here, we discretize the blank space between the
     # wall and the paddle as an 16 row by 18 column grid
-    cellHeight = 6
-    cellWidth = 8
+    cellHeight = 3
+    cellWidth = 4
 
     # Define start and end of discretization space
     startX = 8
@@ -87,9 +87,9 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
     except FileNotFoundError:
         epOffset = 0
 
-    print(values)
-    print(training_data)
-    print(epOffset)
+    # print(values)
+    # print(training_data)
+    # print(epOffset)
 
     for i in tqdm(range(num_episodes)):
         episode = []
@@ -172,16 +172,19 @@ def policy(state, values, epsilon):
 env = gym.make("ALE/Breakout-v5")
 env = TimeLimit(env, max_episode_steps=1000)
 # Evaluate the policy using the Monte Carlo method
-values, tData = monte_carlo_policy_evaluation(env, 0.99, 10)
+values, tData = monte_carlo_policy_evaluation(env, 0.99, 200)
 
 # assume that your training data is a list of (episode, reward) tuples
 
 # extract the episode numbers and reward values from the training data
-episodes = [data[0] for data in tData]
-rewards = [data[1] for data in tData]
+x = [data[0] for data in tData]
+y = [data[1] for data in tData]
+
 
 # create a line plot of rewards versus episodes
-plt.plot(episodes, rewards)
+plt.plot(x, y)
+
+
 
 # add axis labels and a title to the plot
 plt.xlabel('Episodes')
@@ -191,6 +194,20 @@ plt.title('Training Progress')
 # display the plot
 plt.show()
 
+x = np.array(x, dtype=float)
+# fit a linear curve an estimate its y-values and their error.
+a, b = np.polyfit(x, y, deg=1)
+
+y_est = a * x + b
+y_err = x.std() * np.sqrt(1/len(x) +
+                          (x - x.mean())**2 / np.sum((x - x.mean())**2))
+
+fig, ax = plt.subplots()
+ax.plot(x, y_est, '-')
+ax.fill_between(x, y_est - y_err, y_est + y_err, alpha=0.2)
+ax.plot(x, y, 'o', color='tab:brown')
+
+plt.show()
 # Print the values for some example states
-print('Value for state (10, 20, 1):', values)
+print('Action-Values', values)
 
