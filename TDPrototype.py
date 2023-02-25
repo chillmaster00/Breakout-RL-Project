@@ -113,24 +113,24 @@ def get_e_greedy_action(sa_values, state, epsilon):
 
 
 # Updates the state-action pair value
-def update_state_action_values(sa_values, alpha, gamma, curr_state, curr_action, next_state, next_reward):
+def update_state_action_values(sa_values, alpha, gamma, curr_state, action, next_state, reward):
     # Variables
-    sa_pair = (curr_state, curr_action)
+    sa_pair = (curr_state, action)
     td_error = 0
     td_target = 0
 
     # Calculate how much the increment is
     next_state_best_action = get_best_action(sa_values, next_state)
 
-    td_target = next_reward
+    td_target = reward
     td_target += gamma * get_sa_value(sa_values, next_state, next_state_best_action)
     
-    td_error = td_target - get_sa_value(sa_values, curr_state, curr_action)
+    td_error = td_target - get_sa_value(sa_values, curr_state, action)
     #   Note: can't use sa_values directly in case
     #       the sa_pair hasn't been met before
 
     # Update the state-action value
-    sa_values[sa_pair] = get_sa_value(sa_values, curr_state, curr_action) # to get the default action val if needed
+    sa_values[sa_pair] = get_sa_value(sa_values, curr_state, action) # to get the default action val if needed
     sa_values[sa_pair] += alpha*td_error
 
 
@@ -138,12 +138,9 @@ def update_state_action_values(sa_values, alpha, gamma, curr_state, curr_action,
 
 
 
-def run_td_learning(num_episodes, gamma, epsilon):
-    # TODO
+def run_td_learning(num_episodes, alpha, gamma, epsilon):
     # Variables
-    policy = defaultdict(int)
     sa_values = defaultdict(float)
-    episodes = []
     
     # Create the environment
     env = gym.make("ALE/Breakout-v5")
@@ -160,17 +157,32 @@ def run_td_learning(num_episodes, gamma, epsilon):
         # Start game by launching ball (Action 1)
         game_state, reward, terminated, truncated, info = env.step(1)
         curr_state = discretize_state(game_state)
+        next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
 
         # Get lives
         lives = info['lives']
 
         # Run the episode to completion
         while not (terminated or truncated):
-            print()
+            # Get the next game state
+            game_state, reward, terminated, truncated, info = env.step(next_action)
+            next_state = discretize_state(game_state)
+
+            # Update the state-action values
+            update_state_action_values(sa_values, alpha, gamma, curr_state, next_action, next_state, reward)
+            curr_state = next_state
+            next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
+
+            # If a life is lost, the ball needs to be fired
+            if info['lives'] != lives:
+                game_state, reward, terminated, truncated, info = env.step(1)
+                lives = info['lives']
+
+            
 
 
-    return 0
+    return sa_values
 
 
 
-run_td_learning(100, 0.90, 0.10)
+run_td_learning(100, 0.10, 0.90, 0.10)
