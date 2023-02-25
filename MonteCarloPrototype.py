@@ -1,6 +1,10 @@
 from collections import defaultdict
 import gymnasium as gym
 import numpy as np
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+
+
 
 def abstract_state(state):
     # Define a mapping of real state to abstract state
@@ -8,10 +12,6 @@ def abstract_state(state):
     # wall and the paddle as an 16 row by 18 column grid
     cellHeight = 6
     cellWidth = 8
-    gridX = 18
-    gridY = 16
-
-    stateGrid = np.zeros((gridX, gridY))
 
     # Define start and end of discretization space
     startX = 8
@@ -19,6 +19,9 @@ def abstract_state(state):
     endX = 152
     endY = 188
 
+    ballX = -1
+    ballY = -1
+    paddleX = -1
 
     # Define the height and width of the screen and the lower limit of the screen we want to search
     screen_height, screen_width, _ = env.observation_space.shape
@@ -34,9 +37,8 @@ def abstract_state(state):
             pixel_color = state[y][x][0]
             if pixel_color > red_threshold:
                 red_pixels.append((x, y))
-    ballX = 0
-    ballY = 0
-    paddleX = 0
+                break
+
     # Calculate grid position of ball
     if (len(red_pixels) > 0):
         ballX = int((red_pixels[0][0] - startX) / cellWidth)
@@ -50,13 +52,14 @@ def abstract_state(state):
             pixel_color = state[y][x][:]
             if pixel_color[0] > red_threshold:
                 red_pixels.append((x, y))
+                break
 
     # Calculate grid position of ball
     if (len(red_pixels) > 0):
         paddleX = int((red_pixels[0][0] - startX) / cellWidth)
 
-    print("Ball is in grid position: (", ballX, ", ", ballY, ")")
-    print("Paddle is in position ",paddleX)
+    # print("Ball is in grid position: (", ballX, ", ", ballY, ")")
+    # print("Paddle is in position ",paddleX)
 
     abstract_state = ballX, ballY, paddleX 
 
@@ -65,38 +68,53 @@ def abstract_state(state):
     
 
 def monte_carlo_policy_evaluation(env, gamma, num_episodes):
-    returns = defaultdict(list)
     values = defaultdict(float)
-    for i in range(num_episodes):
+    training_data = []
+
+    for i in tqdm(range(num_episodes)):
         episode = []
+        returns = defaultdict(list)
+
+
         state = env.reset()
+
         terminated = False
         truncated = False
-        lives = 5
+
         next_state, reward, terminated, truncated, info = env.step(1)
-        lives = info['lives']
         state = next_state
+        aState = abstract_state(state)
+
+
+        lives = 5
+        lives = info['lives']
+
         while not (terminated or truncated):
-            action = 2
+            action = policy(aState, values, 1/(i+1))
             if info['lives'] != lives:
                 # Fire the ball with action 1
                 action = 1
                 lives = info['lives']
 
             next_state, reward, terminated, truncated, info = env.step(action)
-            state = abstract_state(state)
-            episode.append((state, action, reward))
+            aState = abstract_state(state)
+            episode.append((aState, action, reward))
             state = next_state
         G = 0
-        print(episode)
+        tG = 0
+        # print(episode)
         for t in reversed(range(len(episode))):
             state, action, reward = episode[t]
             G = gamma * G + reward
+            tG += reward
             for t2 in range (t):
-                if t2 != t:
-                    returns[state] = [G]
-                    values[state] = np.mean(returns[state])
-    return values
+                for a in range (3):
+                    if t2 != t:
+                        if a != action:
+                            returns[state, action] = [G]
+                            values[state, action] = np.mean(returns[state, action])
+        training_data.append((i,tG))
+    return values, training_data
 
 # Define the policy function
 def policy(state, values, epsilon):
@@ -112,14 +130,31 @@ def policy(state, values, epsilon):
         return np.random.choice([0, 2, 3])
     else:
         actions = [0, 2, 3]
-        q_values = [values.get((state, a), 0) for a in actions]
+        q_values = [values[state, a] for a in actions]  # convert state to a tuple
         return actions[np.argmax(q_values)]
 
 # Create the environment
-env = gym.make("ALE/Breakout-v5", render_mode="human")
+env = gym.make("ALE/Breakout-v5")
 
 # Evaluate the policy using the Monte Carlo method
-values = monte_carlo_policy_evaluation(env, 0.99, 10)
+values, tData = monte_carlo_policy_evaluation(env, 0.90, 1000)
+
+# assume that your training data is a list of (episode, reward) tuples
+
+# extract the episode numbers and reward values from the training data
+episodes = [data[0] for data in tData]
+rewards = [data[1] for data in tData]
+
+# create a line plot of rewards versus episodes
+plt.plot(episodes, rewards)
+
+# add axis labels and a title to the plot
+plt.xlabel('Episodes')
+plt.ylabel('Rewards')
+plt.title('Training Progress')
+
+# display the plot
+plt.show()
 
 # Print the values for some example states
 print('Value for state (10, 20, 1):', values)
