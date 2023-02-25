@@ -23,6 +23,8 @@ end_y = 188
 def_pos = -1
 red_threshold = 150
 
+def_action_val = 1000 # guarantees each action for each state is tried at least once
+
 
 # Given the environment and the state returned
 # by .step(), return a tuple of the discretized
@@ -65,7 +67,7 @@ def discretize_state(env, state):
 
 
 # Return a policy action according to e-greedy
-def get_policy_action(policy, discretized_state, epsilon):
+def get_e_greedy_action(sa_values, state, epsilon):
     # TODO, check to see if this works
     # Check for exploration and, if so, return a random action
     # Note for actions:
@@ -76,16 +78,26 @@ def get_policy_action(policy, discretized_state, epsilon):
     if np.random.rand() < epsilon:
         return np.random.choice([0, 2, 3])
     
-    # Pick the best action, defaulting to action 0
-    # if there are no such action
+    # Pick the best action
     action_values = []
+    best_action, best_action_val = 0, -1
     for a in [0, 2, 3]:
-        if (discretized_state, a) in policy:
-            action_values.append(a)
-        else:
-            action_values.append(0)
+        # Variables
+        sa_pair = (state, a)
+        curr_action_val = -1
 
-    return max(action_values)
+        # Find a value for the state-action pair
+        if (sa_pair) in sa_values:
+            curr_action_val = sa_values[sa_pair]
+        else:
+            curr_action_val = def_action_val
+        
+        # Determine the best action
+        if curr_action_val > best_action_val:
+            best_action, best_action_val = a, curr_action_val
+        
+
+    return best_action
 
 
 
@@ -116,8 +128,8 @@ def run_td_learning(num_episodes, gamma, epsilon):
         lives = info['lives']
 
         # Run the episode to completion
-#        while not (terminated or truncated):
-
+        while not (terminated or truncated):
+            print()
 
 
     return 0
