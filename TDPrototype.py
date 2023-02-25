@@ -1,3 +1,9 @@
+# TDPRototype.py
+#   Written by An Nguyen
+#   References "MonteCarloPrototype.py" by Trevor Maxwell
+# Purpose
+#   Performs TD learning on Atari's Breakout 2600
+
 from collections import defaultdict
 import gymnasium as gym
 import numpy as np
@@ -6,16 +12,16 @@ from tqdm import tqdm
 
 
 # Constant Variables
-cellHeight = 6
-cellWidth = 8
+cell_height = 6
+cell_width = 8
 
-startX = 8
-endX = 152
-startY = 93
-endY = 188
+start_x = 8
+end_x = 152
+start_y = 93
+end_y = 188
 
-defaultPos = -1
-redThreshold = 150
+def_pos = -1
+red_threshold = 150
 
 
 # Given the environment and the state returned
@@ -24,68 +30,97 @@ redThreshold = 150
 def discretize_state(env, state):
     # TODO, check to see if it works
     # Default positions of ball and paddle
-    ballX, ballY = defaultPos, defaultPos
-    paddleX = defaultPos
+    ball_x, ball_y = def_pos, def_pos
+    paddle_x = def_pos
 
     # Loop through the bottom half of the screen
     # and find the position of the ball
-    for x in range(startX, endX):
-        for y in range (startY, endY):
-            pixelColor = state[y][x][0]
-            if pixelColor > redThreshold:
-                ballX = int((x-startX) / cellWidth)
-                ballY = int((y-startY) / cellHeight)
+    for x in range(start_x, end_x):
+        for y in range (start_y, end_y):
+            paddle_color = state[y][x][0]
+            if paddle_color > red_threshold:
+                ball_x = int((x-start_x) / cell_width)
+                ball_y = int((y-start_y) / cell_height)
                 break
 
-        if (ballX != defaultPos) or (ballY != defaultPos):
+        if (ball_x != def_pos) or (ball_y != def_pos):
             break
 
     # Loop through the remaining bottom half of the screen
     # and find the position of the paddle
     screenH, screenW, _ = env.observation_space.shape
 
-    for x in range(startX, endX):
-        for y in range(endY, screenH):
-            pixelColor = state[y][x][0]
-            if pixelColor > redThreshold:
-                paddleX = int((x-startX) / cellWidth)
+    for x in range(start_x, end_x):
+        for y in range(end_y, screenH):
+            paddle_color = state[y][x][0]
+            if paddle_color > red_threshold:
+                paddle_x = int((x-start_x) / cell_width)
                 break
         
-        if paddleX != defaultPos:
+        if paddle_x != def_pos:
             break
 
     # Return the state as 
-    return (ballX, ballY, paddleX)
+    return (ball_x, ball_y, paddle_x)
 
 
-def td_policy_evaluation():
-    # TODO
-    # Variables
-    returns = []
-    return 0
+# Return a policy action according to e-greedy
+def get_policy_action(policy, discretized_state, epsilon):
+    # TODO, check to see if this works
+    # Check for exploration and, if so, return a random action
+    # Note for actions:
+    #   0 - do nothing
+    #   1 - fire (spawns a ball if ball is gone)
+    #   2 - move paddle to the left
+    #   3 - move paddle to the right
+    if np.random.rand() < epsilon:
+        return np.random.choice([0, 2, 3])
+    
+    # Pick the best action, defaulting to action 0
+    # if there are no such action
+    action_values = []
+    for a in [0, 2, 3]:
+        if (discretized_state, a) in policy:
+            action_values.append(a)
+        else:
+            action_values.append(0)
 
-def update_policy():
-    # TODO
-    return 0
+    return max(action_values)
+
+
 
 def run_td_learning(num_episodes, gamma, epsilon):
     # TODO
     # Variables
     policy = defaultdict(int)
+    sa_values = defaultdict(float)
     episodes = []
     
     # Create the environment
     env = gym.make("ALE/Breakout-v5")
 
-    # 
+    # Run episodes of TD Learning
+    for episode in tqdm(range(num_episodes)):
+        # Reset the environment
+        env.reset()
+
+        # Prime the loop
+        terminated = False
+        truncated  = False
+
+        # Start game by launching ball (Action 1)
+        game_state, reward, terminated, truncated, info = env.step(1)
+        curr_state = discretize_state(game_state)
+
+        # Get lives
+        lives = info['lives']
+
+        # Run the episode to completion
+#        while not (terminated or truncated):
+
+
 
     return 0
-
-def run_td_learning(num_episodes, gamma):
-    return run_td_learning(num_episodes, gamma, 0)
-
-def run_td_learning(num_episodes):
-    return run_td_learning(num_episodes, 1)
 
 
 
