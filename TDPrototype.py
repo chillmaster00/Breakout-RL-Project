@@ -197,7 +197,7 @@ def run_td_learning(num_episodes, alpha, gamma, epsilon, time_limit):
 
 
 # Run the TD Learning experiment
-num_episodes = 10000
+num_episodes = 1000
 alpha = 0.10
 gamma = 0.90
 epsilon = 0.10
