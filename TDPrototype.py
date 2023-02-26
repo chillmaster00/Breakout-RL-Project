@@ -197,7 +197,7 @@ def run_td_learning(num_episodes, alpha, gamma, epsilon, time_limit):
 
 
 # Run the TD Learning experiment
-num_episodes = 1000
+num_episodes = 10000
 alpha = 0.10
 gamma = 0.90
 epsilon = 0.10
@@ -227,9 +227,14 @@ plt.clf()
 
 # fit a linear curve an estimate its growth of reward and their error.
 a, b = np.polyfit(x, y, 1)
-plt.scatter(x, y)
-plt.plot(x,a*x+b)
+plt.scatter(x[::100], y[::100])
+plt.plot(x,a*x+b, "r-")
+plt.xlabel("Episodes")
+plt.ylabel("Rewards")
 
 # save best-fit plot as a file
 plt.savefig(best_fit_file_name)
 plt.show()
+
+print("A = ", a)
+print("B = ", b)
