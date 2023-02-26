@@ -12,7 +12,9 @@ from collections import defaultdict
 import gymnasium as gym
 import numpy as np
 import matplotlib.pyplot as plt
+from gymnasium.wrappers import TimeLimit
 from tqdm import tqdm
+from datetime import datetime
 
 
 # Constant Variables
@@ -92,7 +94,7 @@ def get_best_action(sa_values, state):
     best_action, best_action_val = 0, -1
 
     # For each valid action, figure out which is best
-    for a in [0, 2, 3]:
+    for a in [0, 1, 2, 3]:
         curr_action_val = get_sa_value(sa_values, state, a)
 
         # Determine the best action
@@ -138,13 +140,14 @@ def update_state_action_values(sa_values, alpha, gamma, curr_state, action, next
 
 
 
-def run_td_learning(num_episodes, alpha, gamma, epsilon):
+def run_td_learning(num_episodes, alpha, gamma, epsilon, time_limit):
     # Variables
     sa_values = defaultdict(float)
     episode_rewards = []
 
     # Create the environment
     env = gym.make("ALE/Breakout-v5")
+    env = TimeLimit(env, max_episode_steps=1000)
 
     # Run episodes of TD Learning
     for episode in tqdm(range(num_episodes)):
@@ -179,9 +182,9 @@ def run_td_learning(num_episodes, alpha, gamma, epsilon):
             curr_state = next_state
             next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
 
-            # If a life is lost or the ball is not visible,
+            # If a life is lost,
             #   try to fire the ball (action 1)
-            if (info['lives'] != lives) or (curr_state[0] == def_pos and curr_state[1] == def_pos):
+            if info['lives'] != lives:
                 game_state, reward, terminated, truncated, info = env.step(1)
                 lives = info['lives']
                 episode_reward += reward
@@ -193,14 +196,40 @@ def run_td_learning(num_episodes, alpha, gamma, epsilon):
     return sa_values, episode_rewards
 
 
+# Run the TD Learning experiment
+num_episodes = 1000
+alpha = 0.10
+gamma = 0.90
+epsilon = 0.10
+time_limit = 1000
 
-sa_values, episode_rewards = run_td_learning(1000, 0.10, 0.90, 0.10)
+sa_values, episode_rewards = run_td_learning(num_episodes, alpha, gamma, epsilon, time_limit)
 print(sa_values)
 print(episode_rewards)
 
-plt.plot(range(0,1000), episode_rewards)
+# Time now
+time = datetime.now().strftime("y%Ym%md%d_h%Hm%Ms%S")
+plot_file_name = time + "_plot_" + str(num_episodes) + ".png"
+best_fit_file_name = time + "_best_fit_" + str(num_episodes) + ".png"
+
+
+# Plot the rewards over episodes
+x = range(num_episodes)
+y = episode_rewards
+plt.plot(x, y)
 plt.xlabel("Episodes")
 plt.ylabel("Rewards")
 plt.title("Reward over Episodes")
-plt.show()
 
+# save plot as a file
+plt.savefig(plot_file_name)
+plt.clf()
+
+# fit a linear curve an estimate its growth of reward and their error.
+a, b = np.polyfit(x, y, 1)
+plt.scatter(x, y)
+plt.plot(x,a*x+b)
+
+# save best-fit plot as a file
+plt.savefig(best_fit_file_name)
+plt.show()
