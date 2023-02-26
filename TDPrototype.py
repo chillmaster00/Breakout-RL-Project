@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gymnasium.wrappers import TimeLimit
 from tqdm import tqdm
+from datetime import datetime
 
 
 # Constant Variables
@@ -206,6 +207,12 @@ sa_values, episode_rewards = run_td_learning(num_episodes, alpha, gamma, epsilon
 print(sa_values)
 print(episode_rewards)
 
+# Time now
+time = datetime.now().strftime("y%Ym%md%d_h%Hm%Ms%S")
+plot_file_name = time + "_plot_" + str(num_episodes) + ".png"
+best_fit_file_name = time + "_best_fit_" + str(num_episodes) + ".png"
+
+
 # Plot the rewards over episodes
 x = range(num_episodes)
 y = episode_rewards
@@ -213,11 +220,16 @@ plt.plot(x, y)
 plt.xlabel("Episodes")
 plt.ylabel("Rewards")
 plt.title("Reward over Episodes")
-plt.show()
 
+# save plot as a file
+plt.savefig(plot_file_name)
+plt.clf()
 
 # fit a linear curve an estimate its growth of reward and their error.
 a, b = np.polyfit(x, y, 1)
 plt.scatter(x, y)
 plt.plot(x,a*x+b)
+
+# save best-fit plot as a file
+plt.savefig(best_fit_file_name)
 plt.show()
