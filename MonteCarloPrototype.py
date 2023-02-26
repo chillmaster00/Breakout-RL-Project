@@ -95,8 +95,8 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
         episode = []
         returns = defaultdict(list)
         epsilon_min = 0.01
-        epsilon_max = 1.0
-        epsilon_decay = 950
+        epsilon_max = 1
+        epsilon_decay = 9500
         eps = max(epsilon_min, epsilon_max - (epsilon_max - epsilon_min) * i / epsilon_decay)
 
 
@@ -114,7 +114,8 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
         lives = info['lives']
 
         while not (terminated or truncated):
-            eps = max(epsilon_min, epsilon_max - (epsilon_max - epsilon_min) * i / epsilon_decay)
+            # (i + epOffset)
+            eps = max(epsilon_min, epsilon_max - (epsilon_max - epsilon_min) * (i)/ epsilon_decay)
             action = policy(aState, values, eps)
             if info['lives'] != lives:
                 # Fire the ball with action 1
@@ -168,11 +169,11 @@ def policy(state, values, epsilon):
         q_values = [values[state, a] for a in actions]  # convert state to a tuple
         return actions[np.argmax(q_values)]
 
-# Create the environment
+# Create the environment    , render_mode="human"
 env = gym.make("ALE/Breakout-v5")
 env = TimeLimit(env, max_episode_steps=1000)
 # Evaluate the policy using the Monte Carlo method
-values, tData = monte_carlo_policy_evaluation(env, 0.99, 200)
+values, tData = monte_carlo_policy_evaluation(env, 0.99, 10000)
 
 # assume that your training data is a list of (episode, reward) tuples
 
@@ -180,9 +181,9 @@ values, tData = monte_carlo_policy_evaluation(env, 0.99, 200)
 x = [data[0] for data in tData]
 y = [data[1] for data in tData]
 
-
+x = np.array(x, dtype=float)
 # create a line plot of rewards versus episodes
-plt.plot(x, y)
+plt.plot(x[::100], y[::100], 'bo')
 
 
 
@@ -205,7 +206,7 @@ y_err = x.std() * np.sqrt(1/len(x) +
 fig, ax = plt.subplots()
 ax.plot(x, y_est, '-')
 ax.fill_between(x, y_est - y_err, y_est + y_err, alpha=0.2)
-ax.plot(x, y, 'o', color='tab:brown')
+ax.plot(x[::10], y[::10], 'o', color='tab:brown')
 
 plt.show()
 # Print the values for some example states
