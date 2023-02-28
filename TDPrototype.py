@@ -139,13 +139,13 @@ def update_state_action_values(sa_values, alpha, gamma, curr_state, action, next
 
 
 
-def run_td_learning(sa_values, episode_rewards, num_episodes, alpha, gamma, epsilon, time_limit):
+def run_td_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, epsilon, time_limit):
     # Create the environment
     env = gym.make("ALE/Breakout-v5")
     env = TimeLimit(env, max_episode_steps=1000)
 
     # Run episodes of TD Learning
-    for episode in tqdm(range(num_episodes)):
+    for episode in tqdm(range(len(episode_rewards), target_episodes)):
         # Variables
         episode_reward = 0
 
