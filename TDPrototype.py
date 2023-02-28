@@ -14,7 +14,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gymnasium.wrappers import TimeLimit
 from tqdm import tqdm
-from datetime import datetime
 
 
 # Constant Variables
@@ -140,9 +139,8 @@ def update_state_action_values(sa_values, alpha, gamma, curr_state, action, next
 
 
 
-def run_td_learning(num_episodes, alpha, gamma, epsilon, time_limit):
+def run_td_learning(sa_values, num_episodes, alpha, gamma, epsilon, time_limit):
     # Variables
-    sa_values = defaultdict(float)
     episode_rewards = []
 
     # Create the environment
@@ -196,45 +194,3 @@ def run_td_learning(num_episodes, alpha, gamma, epsilon, time_limit):
     return sa_values, episode_rewards
 
 
-# Run the TD Learning experiment
-num_episodes = 1000
-alpha = 0.10
-gamma = 0.90
-epsilon = 0.10
-time_limit = 1000
-
-sa_values, episode_rewards = run_td_learning(num_episodes, alpha, gamma, epsilon, time_limit)
-print(sa_values)
-print(episode_rewards)
-
-# Time now
-time = datetime.now().strftime("y%Ym%md%d_h%Hm%Ms%S")
-plot_file_name = time + "_plot_" + str(num_episodes) + ".png"
-best_fit_file_name = time + "_best_fit_" + str(num_episodes) + ".png"
-
-
-# Plot the rewards over episodes
-x = range(num_episodes)
-y = episode_rewards
-plt.plot(x, y)
-plt.xlabel("Episodes")
-plt.ylabel("Rewards")
-plt.title("Reward over Episodes")
-
-# save plot as a file
-plt.savefig(plot_file_name)
-plt.clf()
-
-# fit a linear curve an estimate its growth of reward and their error.
-a, b = np.polyfit(x, y, 1)
-plt.scatter(x[::100], y[::100])
-plt.plot(x,a*x+b, "r-")
-plt.xlabel("Episodes")
-plt.ylabel("Rewards")
-
-# save best-fit plot as a file
-plt.savefig(best_fit_file_name)
-plt.show()
-
-print("A = ", a)
-print("B = ", b)
