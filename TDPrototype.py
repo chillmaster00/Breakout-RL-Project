@@ -107,7 +107,7 @@ def get_best_action(sa_values, state):
 def get_e_greedy_action(sa_values, state, epsilon):
     # Check for exploration and, if so, return a random action
     if np.random.rand() < epsilon:
-        return np.random.choice([0, 2, 3])
+        return np.random.choice([0, 1, 2, 3])
     
     # Otherwise, get the best action for the state
     return get_best_action(sa_values, state)
