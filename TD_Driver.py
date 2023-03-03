@@ -16,6 +16,16 @@ def save_to_file(fname:str, data):
     os.makedirs(os.path.dirname(fname), exist_ok=True)
     with open(fname, 'wb') as f:
         pickle.dump(data, f)
+        f.close()
+
+    return 0
+
+def write_to_file(fname:str, message:str):
+    os.makedirs(os.path.dirname(fname), exist_ok=True)
+    with open(fname, 'w') as f:
+        f.write(message)
+        f.close()
+
 
     return 0
 
@@ -53,14 +63,11 @@ def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, ta
     plot_file_name = file_prefix + "plot.png"
     sa_values_file_name = file_prefix + "sa_values.pyc"
     episode_rewards_file_name = file_prefix + "episode_rewards.pyc"
-    a_file_name = file_prefix + "a.pyc"
-    b_file_name = file_prefix + "b.pyc"
+    info_file_name = file_prefix + "info.txt"
 
 
     # Run the TD Learning session
     sa_values, episode_rewards = td.run_td_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, epsilon, time_limit)
-#    print(sa_values)
-#    print(episode_rewards)
 
     # Save the td training reward info
     save_to_file(sa_values_file_name, sa_values)
@@ -74,35 +81,43 @@ def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, ta
     # Graph the data points
     a, b = save_graph(x, y, 100, "Episodes", "Total Reward", "Rewards over Episodes", plot_file_name)
 
-    # Save the calculation of a and b
-    save_to_file(a_file_name, a)
-    save_to_file(b_file_name, b)
+    # Save information
+    message = "Y = A*X + B\n"
+    message += "\tA = " + str(a) + "\n"
+    message += "\tB = " + str(b) + "\n"
+    message += "max = " + str(max(episode_rewards[:target_episodes])) + "\n"
+    message += "target episodes = " + str(target_episodes) + "\n"
+    message += "alpha = " + str(alpha) + "\n"
+    message += "gamma = " + str(gamma) + "\n"
+    message += "epsilon = " + str(epsilon) + "\n"
+    message += "time limit = " + str(time_limit) + "\n"
+    write_to_file(info_file_name, message)
 
     return sa_values, episode_rewards
 
 
 # Variables for TD Learning session
-target_episodes = 100
+target_episodes = 10000
 alpha = 0.10
 gamma = 0.90
 epsilon = 0.10
-time_limit = 1000
+time_limit = 10000
 
 # Variables for saving session information
 time = datetime.now().strftime("%Y-%m-%d_h%Hm%Ms%S")
-file_path = "td_save_data\\" + time + "\\"
+file_path = "td_save_data\\Test2A\\"
 
 # Starting data
 sa_values = defaultdict(float)
 episode_rewards = []
 """
-load_file_prefix = "save_data\\10000\\2023-02-28_h17m19s46\\td_1000_"
-sa_values = load_from_file(load_file_prefix + "sa_values.pyc")
-episode_rewards = load_from_file(load_file_prefix + "episode_rewards.pyc")
+load_file_path = file_path
+sa_values = load_from_file(load_file_path + "sa_values.pyc")
+episode_rewards = load_from_file(load_file_path + "episode_rewards.pyc")
 """
 
 # Break up session into multiple iterations
-ep_per_iter = 1000
+ep_per_iter = 100
 ep_per_iter = min(target_episodes, ep_per_iter)
 iterations = int(target_episodes/ep_per_iter)
 iterations = max(1, iterations)
