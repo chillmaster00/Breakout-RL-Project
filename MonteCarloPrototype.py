@@ -11,8 +11,8 @@ def abstract_state(state):
     # Define a mapping of real state to abstract state
     # Here, we discretize the blank space between the
     # wall and the paddle as an 16 row by 18 column grid
-    cellHeight = 3
-    cellWidth = 4
+    cellHeight = 10
+    cellWidth = 10
 
     # Define start and end of discretization space
     startX = 8
@@ -95,9 +95,8 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
         episode = []
         returns = defaultdict(list)
         epsilon_min = 0.01
-        epsilon_max = 1
+        epsilon_max = 0.01
         epsilon_decay = 9500
-        eps = max(epsilon_min, epsilon_max - (epsilon_max - epsilon_min) * i / epsilon_decay)
 
 
         state = env.reset()
@@ -133,12 +132,10 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
             state, action, reward = episode[t]
             G = gamma * G + reward
             tG += reward
-            for t2 in range (t):
-                for a in range (3):
-                    if t2 != t:
-                        if a != action:
-                            returns[state, action].append(G)
-                            values[state, action] = np.mean(returns[state, action])
+            if (state, action) not in returns:
+                returns[(state, action)] = []
+            returns[(state, action)].append(G)
+            values[state, action] = np.mean(returns[(state, action)])
         training_data.append((i + epOffset,tG))
 
     epOffset = len(training_data)
@@ -170,10 +167,10 @@ def policy(state, values, epsilon):
         return actions[np.argmax(q_values)]
 
 # Create the environment    , render_mode="human"
-env = gym.make("ALE/Breakout-v5")
-env = TimeLimit(env, max_episode_steps=1000)
+env = gym.make("ALE/Breakout-v5", frameskip=2, repeat_action_probability=0, render_mode="human")
+env = TimeLimit(env, max_episode_steps=10000)
 # Evaluate the policy using the Monte Carlo method
-values, tData = monte_carlo_policy_evaluation(env, 0.99, 10000)
+values, tData = monte_carlo_policy_evaluation(env, 0.90, 10000)
 
 # assume that your training data is a list of (episode, reward) tuples
 
@@ -197,18 +194,17 @@ plt.show()
 
 x = np.array(x, dtype=float)
 # fit a linear curve an estimate its y-values and their error.
-a, b = np.polyfit(x, y, deg=1)
-
-y_est = a * x + b
-y_err = x.std() * np.sqrt(1/len(x) +
-                          (x - x.mean())**2 / np.sum((x - x.mean())**2))
-
-fig, ax = plt.subplots()
-ax.plot(x, y_est, '-')
-ax.fill_between(x, y_est - y_err, y_est + y_err, alpha=0.2)
-ax.plot(x[::10], y[::10], 'o', color='tab:brown')
+a, b = np.polyfit(x, y, 1)
+print(a)
+plt.scatter(x[::100], y[::100])
+plt.plot(x,a*x+b, "r-")
+plt.xlabel("Episodes")
+plt.ylabel("Rewards")
+plt.plot(x[::100], y[::100], 'o', color='tab:blue')
 
 plt.show()
 # Print the values for some example states
 print('Action-Values', values)
+print(a)
+
 
