@@ -105,7 +105,7 @@ time_limit = 10000
 
 # Variables for saving session information
 time = datetime.now().strftime("%Y-%m-%d_h%Hm%Ms%S")
-file_path = "td_save_data\\Test2A\\"
+file_path = "td_save_data\\Test2AA\\"
 
 # Starting data
 sa_values = defaultdict(float)
