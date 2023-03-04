@@ -1,0 +1,13 @@
+Y = A*X + B
+	A = 0.00012722923327229232
+	B = 1.5107174482551753
+max = 15.0
+target episodes = 10000
+alpha = 0.1
+gamma = 0.9
+epsilon = 0.1
+time limit = 1000
+
+
+Notes:
+	Basic test to show growth over the growing number of episodes
