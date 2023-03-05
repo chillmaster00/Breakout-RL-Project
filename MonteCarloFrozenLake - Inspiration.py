@@ -3,12 +3,12 @@ from gym import wrappers
 import numpy as np
 from tqdm import tqdm
 
-env = gym.make("FrozenLake-v1", is_slippery=False)
+env = gym.make("FrozenLake-v1")
 
 Q = np.zeros([env.observation_space.n, env.action_space.n])
 n_s_a = np.zeros([env.observation_space.n, env.action_space.n])
 
-num_episodes = 100000
+num_episodes = 1000000
 epsilon = 0.2
 rList = []
 

@@ -14,9 +14,9 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
     # Read the saved values and training data from a file (if it exists)
     try:
         with open('saves/training.pkl', 'rb') as f:
-            training_data = pickle.load(f)
+            trainingData = pickle.load(f)
     except FileNotFoundError:
-        training_data = []
+        trainingData = []
     try:
         with open('saves/values.pkl', 'rb') as f:
             Q = pickle.load(f)
@@ -31,14 +31,14 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
     # print(Q)
     # print(training_data)
     # print(epOffset)
-    Gtotal = []
+    Gtotal = 0.0
     N = np.zeros([env.observation_space.n, env.action_space.n])
 
     for i in tqdm(range(num_episodes)):
         episode = []
-        epsilon_min = 0.01
-        epsilon_max = 1
-        epsilon_decay = 1000000
+        epsilonMin = 0.01
+        epsilonMax = 1
+        epsilonDecay = 1000000
 
         state, info = env.reset()
 
@@ -48,14 +48,13 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
         Gt = 0.0
         while not (terminated or truncated):
             # (i + epOffset)
-            eps = max(epsilon_min, epsilon_max - (epsilon_max - epsilon_min) * (i)/ epsilon_decay)
-            action = policy(state, Q, 0.2)
-            next_state, reward, terminated, truncated, info = env.step(action)
+            eps = max(epsilonMin, epsilonMax - (epsilonMax - epsilonMin) * (i)/ epsilonDecay)
+            action = policy(state, Q, 0.0)
+            nState, reward, terminated, truncated, info = env.step(action)
             Gt += reward
             episode.append((state, action))
-            state = next_state
-        Gtotal.append(Gt)
-        #print(episode)
+            state = nState
+        Gtotal += Gt
         for t in range(len(episode)):
             state, action = episode[t]
 
@@ -63,22 +62,22 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
             alpha = 1.0 / N[state, action]
             Q[state, action] += alpha * (Gt - Q[state, action])
 
-        training_data.append((i + epOffset,Gt))
+        trainingData.append((i + epOffset, Gt))
 
             
         if (i % 10000 == 0) and i != 0:
-            print("\nW/L Ratio: " + str(sum(Gtotal) / i))
+            print("\nW/L Ratio: " + str(Gtotal / i))
 
-    epOffset = len(training_data)
+    epOffset = len(trainingData)
     # save the files to a file using pickle.dump
     with open('saves/values.pkl', 'wb') as f:
         pickle.dump(Q, f)
     with open('saves/training.pkl', 'wb') as f:
-        pickle.dump(training_data, f)
+        pickle.dump(trainingData, f)
     with open('saves/epOffset.pkl', 'wb') as f:
         pickle.dump(epOffset, f)
 
-    return Q, training_data
+    return Q, trainingData
 
 # Define the policy function
 def policy(state, values, epsilon):
@@ -98,9 +97,10 @@ def policy(state, values, epsilon):
         return actions[np.argmax(q_values)]
 
 # Create the environment    , render_mode="human"
+# , is_slipping=False
 env = gym.make("FrozenLake-v1")
 # Evaluate the policy using the Monte Carlo method
-values, tData = monte_carlo_policy_evaluation(env, 0.99, 2000000)
+values, tData = monte_carlo_policy_evaluation(env, 0.99, 100000)
 
 # assume that your training data is a list of (episode, reward) tuples
 
@@ -110,7 +110,7 @@ y = [data[1] for data in tData]
 
 x = np.array(x, dtype=float)
 # create a line plot of rewards versus episodes
-plt.plot(x[::1000], y[::1000], 'bo')
+plt.plot(x[::10000], y[::10000], 'bo')
 
 
 
@@ -126,11 +126,11 @@ x = np.array(x, dtype=float)
 # fit a linear curve an estimate its y-values and their error.
 a, b = np.polyfit(x, y, 1)
 print(a)
-plt.scatter(x[::1000], y[::1000])
+plt.scatter(x[::10000], y[::10000])
 plt.plot(x,a*x+b, "r-")
 plt.xlabel("Episodes")
 plt.ylabel("Rewards")
-plt.plot(x[::1000], y[::1000], 'o', color='tab:blue')
+plt.plot(x[::10000], y[::10000], 'o', color='tab:blue')
 
 plt.show()
 # Print the values for some example states
