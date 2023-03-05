@@ -19,6 +19,7 @@ def save_to_file(fname:str, data):
 
     return 0
 
+
 def write_to_file(fname:str, message:str):
     os.makedirs(os.path.dirname(fname), exist_ok=True)
     with open(fname, 'w') as f:
@@ -27,6 +28,7 @@ def write_to_file(fname:str, message:str):
 
 
     return 0
+
 
 def load_from_file(fname: str):
     data = 0
@@ -37,6 +39,7 @@ def load_from_file(fname: str):
         print("Error loading data from " + fname)
     
     return data
+
 
 def save_graph(x: list, y: list, num_pts: int, x_name: str, y_name: str, title: str, fname: str):
     a, b = np.polyfit(x, y, 1)
@@ -55,11 +58,13 @@ def save_graph(x: list, y: list, num_pts: int, x_name: str, y_name: str, title: 
     plt.clf()
     return a, b
 
+
 def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, target_episodes: int, alpha: float, gamma: float, epsilon: float, time_limit: int):
     # File names for saving
     file_prefix = file_path
 
-    plot_file_name = file_prefix + "plot.png"
+    rewards_plot_fname = file_prefix + "rewards_plot.png"
+    winloss_plot_fname = file_prefix + "winloss_plot.png"
     sa_values_file_name = file_prefix + "sa_values.pyc"
     episode_rewards_file_name = file_prefix + "episode_rewards.pyc"
     info_file_name = file_prefix + "info.txt"
@@ -73,17 +78,41 @@ def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, ta
     save_to_file(episode_rewards_file_name, episode_rewards)
 
 
-    # Fit a linear curve an estimate its growth of reward and their error.
+    # Graph the reward over episodes
     x = range(len(episode_rewards))[:target_episodes]
-    y = episode_rewards[:target_episodes]
+    rewards_y = episode_rewards[:target_episodes]
 
     # Graph the data points
-    a, b = save_graph(x, y, 100, "Episodes", "Total Reward", "Rewards over Episodes", plot_file_name)
+    rewards_a, rewards_b = save_graph(x, rewards_y, 100, "Episodes", "Total Reward", "Rewards over Episodes", rewards_plot_fname)
+
+
+    # Graph the win/loss ratio over episodes
+    winloss_y = []
+    num_wins = 0
+    num_losses = 0
+
+    for i in x:
+        if episode_rewards[i] > 0:
+            num_wins += 1
+        if episode_rewards[i] <= 0:
+            num_losses += 1
+
+        # prevent divison by 0
+        if num_losses > 0:
+            winloss_y.append(num_wins/num_losses)
+        else:
+            winloss_y.append(num_wins/1)
+
+    winloss_a, winloss_b = save_graph(x, winloss_y, 100, "Episodes", "Win/Loss Ratio", "W/L over Episodes", winloss_plot_fname)
 
     # Save information
-    message = "Y = A*X + B\n"
-    message += "\tA = " + str(a) + "\n"
-    message += "\tB = " + str(b) + "\n"
+    message = "Reward over Episodes: Y = A*X + B\n"
+    message += "\tA = " + str(rewards_a) + "\n"
+    message += "\tB = " + str(rewards_b) + "\n"
+    message += "max = " + str(max(episode_rewards[:target_episodes])) + "\n"
+    message += "Win/Loss over Episodes: Y = A*X + B\n"
+    message += "\tA = " + str(winloss_a) + "\n"
+    message += "\tB = " + str(winloss_b) + "\n"
     message += "max = " + str(max(episode_rewards[:target_episodes])) + "\n"
     message += "target episodes = " + str(target_episodes) + "\n"
     message += "alpha = " + str(alpha) + "\n"
@@ -95,30 +124,79 @@ def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, ta
     return sa_values, episode_rewards
 
 
-# Variables for TD Learning session
-target_episodes = 10000
-alpha = 0.10
-gamma = 0.90
-epsilon = 0.10
+def run_test(target_episodes:int, alpha:float, gamma:float, epsilon:float, time_limt:int, ep_per_iter:int, save_fpath:str, load_fpath: str):
+    # Variables for saving session information
+
+    # Starting data
+    sa_values = defaultdict(float)
+    episode_rewards = []
+
+    if len(load_fpath) > 0:
+        sa_values = load_from_file(load_fpath + "sa_values.pyc")
+        episode_rewards = load_from_file(load_fpath + "episode_rewards.pyc")
+
+
+    # Break up session into multiple iterations
+    ep_per_iter = min(target_episodes, ep_per_iter)
+    iterations = int(target_episodes/ep_per_iter)
+    iterations = max(1, iterations)
+    for i in tqdm(range(0, iterations)):
+        t_ep = (i+1) * ep_per_iter
+        sa_values, episode_rewards = td_session(save_fpath, sa_values, episode_rewards, t_ep, alpha, gamma, epsilon, time_limit)
+
+    return 0
+
+
+# Default variables for TD Experiment 1
+target_episodes = 1000
+alpha = 1.0
+gamma = 1.0
+epsilon = 0.0
 time_limit = 10000
+ep_per_iter = int(target_episodes/100)
+save_fpath = "td_save_data\\Test1\\base\\"
+load_fpath = ""
 
-# Variables for saving session information
-file_path = "td_save_data\\Test1\\"
-
-# Starting data
-sa_values = defaultdict(float)
-episode_rewards = []
-
-#load_file_path = file_path
-#sa_values = load_from_file(load_file_path + "sa_values.pyc")
-#episode_rewards = load_from_file(load_file_path + "episode_rewards.pyc")
+run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
 
 
-# Break up session into multiple iterations
-ep_per_iter = 100
-ep_per_iter = min(target_episodes, ep_per_iter)
-iterations = int(target_episodes/ep_per_iter)
-iterations = max(1, iterations)
-for i in tqdm(range(0, iterations)):
-    t_ep = (i+1) * ep_per_iter
-    sa_values, episode_rewards = td_session(file_path, sa_values, episode_rewards, t_ep, alpha, gamma, epsilon, time_limit)
+# Run alpha-half test
+alpha = 0.5
+save_fpath = "td_sava_data\\Test1\\alpha-half\\"
+run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
+
+# Run alpha-low test
+alpha = 0.1
+save_fpath = "td_sava_data\\Test1\\alpha-low\\"
+run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
+
+# Reset alpha
+alpha = 1.0
+
+
+# Run gamma-half test
+gamma = 0.5
+save_fpath = "td_sava_data\\Test1\\gamma-half\\"
+run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
+
+# Run gamma-low test
+gamma = 0.1
+save_fpath = "td_sava_data\\Test1\\gamma-low\\"
+run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
+
+# Reset gamma
+gamma = 1.0
+
+
+# Run epsilon-half test
+epsilon = 0.5
+save_fpath = "td_sava_data\\Test1\\epsilon_half\\"
+run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
+
+# Run epsilon-low test
+epsilon = 0.1
+save_fpath = "td_sava_data\\Test1\\epsilon_low\\"
+run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
+
+# Reset epsilon
+epsilon = 0.0
