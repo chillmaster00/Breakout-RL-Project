@@ -110,17 +110,13 @@ def run_td_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, e
         episode_reward = 0
 
         # Reset the environment
-        env.reset()
+        game_state, info = env.reset()
 
         # Prime the loop
+        curr_state = game_state
+        next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
         terminated = False
         truncated  = False
-
-        # Start game by launching ball (Action 1)
-        game_state, reward, terminated, truncated, info = env.step(1)
-        curr_state = discretize_state(env, game_state)
-        next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
-        episode_reward += reward
 
         # Run the episode to completion
         while not (terminated or truncated):
