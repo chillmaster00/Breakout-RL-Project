@@ -4,7 +4,6 @@
 from collections import defaultdict
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime
 from tqdm import tqdm
 import pickle
 import os
@@ -104,17 +103,16 @@ epsilon = 0.10
 time_limit = 10000
 
 # Variables for saving session information
-time = datetime.now().strftime("%Y-%m-%d_h%Hm%Ms%S")
-file_path = "td_save_data\\Test2AA\\"
+file_path = "td_save_data\\Test1\\"
 
 # Starting data
 sa_values = defaultdict(float)
 episode_rewards = []
-"""
-load_file_path = file_path
-sa_values = load_from_file(load_file_path + "sa_values.pyc")
-episode_rewards = load_from_file(load_file_path + "episode_rewards.pyc")
-"""
+
+#load_file_path = file_path
+#sa_values = load_from_file(load_file_path + "sa_values.pyc")
+#episode_rewards = load_from_file(load_file_path + "episode_rewards.pyc")
+
 
 # Break up session into multiple iterations
 ep_per_iter = 100

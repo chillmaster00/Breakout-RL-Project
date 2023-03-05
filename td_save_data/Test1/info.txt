@@ -1,0 +1,9 @@
+Y = A*X + B
+	A = 1.079632810796327e-05
+	B = 0.7918237576242378
+max = 1.0
+target episodes = 10000
+alpha = 0.1
+gamma = 0.9
+epsilon = 0.1
+time limit = 10000
