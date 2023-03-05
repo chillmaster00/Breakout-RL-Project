@@ -153,7 +153,7 @@ alpha = 1.0
 gamma = 1.0
 epsilon = 0.0
 time_limit = 10000
-ep_per_iter = int(target_episodes/100)
+ep_per_iter = int(target_episodes/10)
 save_fpath = "td_save_data\\Test1\\base\\"
 load_fpath = ""
 
@@ -162,12 +162,12 @@ run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_f
 
 # Run alpha-half test
 alpha = 0.5
-save_fpath = "td_sava_data\\Test1\\alpha-half\\"
+save_fpath = "td_save_data\\Test1\\alpha-half\\"
 run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
 
 # Run alpha-low test
 alpha = 0.1
-save_fpath = "td_sava_data\\Test1\\alpha-low\\"
+save_fpath = "td_save_data\\Test1\\alpha-low\\"
 run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
 
 # Reset alpha
@@ -176,12 +176,12 @@ alpha = 1.0
 
 # Run gamma-half test
 gamma = 0.5
-save_fpath = "td_sava_data\\Test1\\gamma-half\\"
+save_fpath = "td_save_data\\Test1\\gamma-half\\"
 run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
 
 # Run gamma-low test
 gamma = 0.1
-save_fpath = "td_sava_data\\Test1\\gamma-low\\"
+save_fpath = "td_save_data\\Test1\\gamma-low\\"
 run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
 
 # Reset gamma
@@ -190,12 +190,12 @@ gamma = 1.0
 
 # Run epsilon-half test
 epsilon = 0.5
-save_fpath = "td_sava_data\\Test1\\epsilon_half\\"
+save_fpath = "td_save_data\\Test1\\epsilon_half\\"
 run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
 
 # Run epsilon-low test
 epsilon = 0.1
-save_fpath = "td_sava_data\\Test1\\epsilon_low\\"
+save_fpath = "td_save_data\\Test1\\epsilon_low\\"
 run_test(target_episodes, alpha, gamma, epsilon, time_limit, ep_per_iter, save_fpath, load_fpath)
 
 # Reset epsilon
