@@ -57,9 +57,9 @@ def get_best_action(sa_values, state):
         if curr_action_val > best_action_val:
             best_action, best_action_val = a, curr_action_val
         
-        # If no action is best, pick a random action
-        if best_action_val == def_action_val:
-            return np.random.choice(action_space)
+    # If no action is best, pick a random action
+    if best_action_val == def_action_val:
+        return np.random.choice(action_space)
     return best_action
 
 
