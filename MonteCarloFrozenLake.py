@@ -65,8 +65,8 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
         trainingData.append((i + epOffset, Gt))
 
             
-        if (i % 10000 == 0) and i != 0:
-            print("\nW/L Ratio: " + str(Gtotal / i))
+        if (i % 100 == 0) and i != 0:
+            print("\nSuccess Rate: " + str(Gtotal / i))
 
     epOffset = len(trainingData)
     # save the files to a file using pickle.dump
@@ -98,9 +98,9 @@ def policy(state, values, epsilon):
 
 # Create the environment    , render_mode="human"
 # , is_slipping=False
-env = gym.make("FrozenLake-v1")
+env = gym.make("FrozenLake-v1", is_slippery=False)
 # Evaluate the policy using the Monte Carlo method
-values, tData = monte_carlo_policy_evaluation(env, 0.99, 100000)
+values, tData = monte_carlo_policy_evaluation(env, 0.99, 10000)
 
 # assume that your training data is a list of (episode, reward) tuples
 
@@ -110,7 +110,7 @@ y = [data[1] for data in tData]
 
 x = np.array(x, dtype=float)
 # create a line plot of rewards versus episodes
-plt.plot(x[::10000], y[::10000], 'bo')
+plt.plot(x[::1000], y[::1000], 'bo')
 
 
 
@@ -126,11 +126,11 @@ x = np.array(x, dtype=float)
 # fit a linear curve an estimate its y-values and their error.
 a, b = np.polyfit(x, y, 1)
 print(a)
-plt.scatter(x[::10000], y[::10000])
+plt.scatter(x[::1000], y[::1000])
 plt.plot(x,a*x+b, "r-")
 plt.xlabel("Episodes")
 plt.ylabel("Rewards")
-plt.plot(x[::10000], y[::10000], 'o', color='tab:blue')
+plt.plot(x[::1000], y[::1000], 'o', color='tab:blue')
 
 plt.show()
 # Print the values for some example states
