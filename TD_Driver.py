@@ -102,7 +102,8 @@ def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, ta
     save_graph(winloss_x, winloss_y, 100, "Episodes", "Win/Loss Ratio", "W/L over Episodes", winloss_plot_fname)
 
     # Save information
-    message = "target episodes = " + str(target_episodes) + "\n"
+    message = "\n"
+    message += "target episodes = " + str(target_episodes) + "\n"
     message += "alpha = " + str(alpha) + "\n"
     message += "gamma = " + str(gamma) + "\n"
     message += "epsilon = " + str(epsilon) + "\n"
@@ -136,7 +137,7 @@ def run_test(target_episodes:int, alpha:float, gamma:float, epsilon:float, time_
 
 
 # Default variables for TD Experiment 1
-target_episodes = 1000
+target_episodes = 10000
 alpha = 1.0
 gamma = 1.0
 epsilon = 0.0

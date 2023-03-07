@@ -1,4 +1,5 @@
-target episodes = 1000
+
+target episodes = 10000
 alpha = 0.5
 gamma = 1.0
 epsilon = 0.0
