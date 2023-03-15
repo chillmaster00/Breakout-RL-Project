@@ -1,12 +1,5 @@
-Reward over Episodes: Y = A*X + B
-	A = 0.0007474147474147478
-	B = -0.20433366633366631
-max = 1.0
-Win/Loss over Episodes: Y = A*X + B
-	A = 5.942456217474088e-05
-	B = 0.009266410177343335
-max = 1.0
-target episodes = 1000
+
+target episodes = 10000
 alpha = 1.0
 gamma = 0.5
 epsilon = 0.0

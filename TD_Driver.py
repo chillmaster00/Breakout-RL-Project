@@ -42,12 +42,7 @@ def load_from_file(fname: str):
 
 
 def save_graph(x: list, y: list, num_pts: int, x_name: str, y_name: str, title: str, fname: str):
-    a, b = np.polyfit(x, y, 1)
-    ind_increment = int(len(x)/num_pts)
-    ind_increment = max(1, ind_increment)
-
     plt.scatter(x, y)
-    plt.plot(x, a*x + b, "r-")
 
     plt.xlabel(x_name)
     plt.ylabel(y_name)
@@ -56,7 +51,7 @@ def save_graph(x: list, y: list, num_pts: int, x_name: str, y_name: str, title: 
 
     plt.savefig(fname)
     plt.clf()
-    return a, b
+    return 0
 
 
 def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, target_episodes: int, alpha: float, gamma: float, epsilon: float, time_limit: int):
@@ -83,10 +78,11 @@ def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, ta
     rewards_y = episode_rewards[:target_episodes]
 
     # Graph the data points
-    rewards_a, rewards_b = save_graph(x, rewards_y, 100, "Episodes", "Total Reward", "Rewards over Episodes", rewards_plot_fname)
+    save_graph(x, rewards_y, 100, "Episodes", "Total Reward", "Rewards over Episodes", rewards_plot_fname)
 
 
     # Graph the win/loss ratio over episodes
+    winloss_x = []
     winloss_y = []
     num_wins = 0
     num_losses = 0
@@ -99,21 +95,14 @@ def td_session(file_path:str , sa_values: defaultdict, episode_rewards: list, ta
 
         # prevent divison by 0
         if num_losses > 0:
+            winloss_x.append(i)
             winloss_y.append(num_wins/num_losses)
-        else:
-            winloss_y.append(num_wins/1)
+        
 
-    winloss_a, winloss_b = save_graph(x, winloss_y, 100, "Episodes", "Win/Loss Ratio", "W/L over Episodes", winloss_plot_fname)
+    save_graph(winloss_x, winloss_y, 100, "Episodes", "Win/Loss Ratio", "W/L over Episodes", winloss_plot_fname)
 
     # Save information
-    message = "Reward over Episodes: Y = A*X + B\n"
-    message += "\tA = " + str(rewards_a) + "\n"
-    message += "\tB = " + str(rewards_b) + "\n"
-    message += "max = " + str(max(episode_rewards[:target_episodes])) + "\n"
-    message += "Win/Loss over Episodes: Y = A*X + B\n"
-    message += "\tA = " + str(winloss_a) + "\n"
-    message += "\tB = " + str(winloss_b) + "\n"
-    message += "max = " + str(max(episode_rewards[:target_episodes])) + "\n"
+    message = "\n"
     message += "target episodes = " + str(target_episodes) + "\n"
     message += "alpha = " + str(alpha) + "\n"
     message += "gamma = " + str(gamma) + "\n"
@@ -148,7 +137,7 @@ def run_test(target_episodes:int, alpha:float, gamma:float, epsilon:float, time_
 
 
 # Default variables for TD Experiment 1
-target_episodes = 1000
+target_episodes = 10000
 alpha = 1.0
 gamma = 1.0
 epsilon = 0.0
