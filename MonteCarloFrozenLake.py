@@ -16,7 +16,7 @@ def calculate_rms_error(optimal_q, estimated_q):
     
     return rms_error
 
-def monte_carlo_policy_evaluation(env, gamma, num_episodes):
+def monte_carlo_policy_evaluation(env, gamma, epsilon, num_episodes):
 
     # Read the saved values and training data from a file (if it exists)
     try:
@@ -53,9 +53,6 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
 
     for i in tqdm(range(num_episodes)):
         episode = []
-        # epsilonMin = 0.01
-        # epsilonMax = 1
-        # epsilonDecay = 1000000
 
         state, info = env.reset()
 
@@ -64,22 +61,26 @@ def monte_carlo_policy_evaluation(env, gamma, num_episodes):
 
         Gt = 0.0
         while not (terminated or truncated):
-            # (i + epOffset)
-            # eps = max(epsilonMin, epsilonMax - (epsilonMax - epsilonMin) * (i)/ epsilonDecay)
-            action = policy(state, Q, 0.2)
+
+            action = policy(state, Q, epsilon)
             nState, reward, terminated, truncated, info = env.step(action)
             Gt += reward
-            episode.append((state, action))
+            episode.append((state, action, reward))
             state = nState
         Gtotal += Gt
-        for t in range(len(episode)):
-            state, action = episode[t]
+        G = 0.0
+        for t in reversed(range(len(episode))):
+            state, action, reward= episode[t]
+            G = gamma * G + reward
 
             N[state, action] += 1.0
             alpha = 1.0 / N[state, action]
-            Q[state, action] += alpha * (Gt - Q[state, action])
+            Q[state, action] += alpha * (G - Q[state, action])
 
-        trainingData.append((i + epOffset, Gt))
+
+        rms_error = calculate_rms_error(optimalQ, Q) * 100.0
+
+        trainingData.append((i + epOffset, rms_error))
 
             
         if (i % 10000 == 0) and i != 0:
@@ -118,11 +119,10 @@ def policy(state, values, epsilon):
         q_values = [values[state, a] for a in actions]  # convert state to a tuple
         return actions[np.argmax(q_values)]
 
-# Create the environment    , render_mode="human"
-# , is_slipping=False
-env = gym.make("FrozenLake-v1", is_slippery=True)
+
+env = gym.make("FrozenLake-v1", is_slippery=True, render_mode="ansi")
 # Evaluate the policy using the Monte Carlo method
-values, tData = monte_carlo_policy_evaluation(env, 0.99, 1000001)
+values, tData = monte_carlo_policy_evaluation(env, 1.0, 0.2, 0)
 
 # assume that your training data is a list of (episode, reward) tuples
 
@@ -131,14 +131,13 @@ x = [data[0] for data in tData]
 y = [data[1] for data in tData]
 
 x = np.array(x, dtype=float)
+
 # create a line plot of rewards versus episodes
-plt.plot(x[::1000], y[::1000], 'bo')
-
-
+plt.plot(x[::1000], y[::1000])
 
 # add axis labels and a title to the plot
 plt.xlabel('Episodes')
-plt.ylabel('Rewards')
+plt.ylabel('RMS Error (%)')
 plt.title('Training Progress')
 
 # display the plot
