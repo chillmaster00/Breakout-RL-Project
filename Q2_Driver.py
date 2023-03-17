@@ -146,7 +146,7 @@ def phase_one():
     # Default variables for TD Experiment 2, using best results from experiment 1
     target_episodes = 10000
     alpha = 0.1
-    gamma = 0.9
+    gamma = 1.0
     epsilon = 0.1
     time_limit = 10000
 

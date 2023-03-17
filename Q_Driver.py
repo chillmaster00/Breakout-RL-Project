@@ -475,7 +475,7 @@ def phase_three():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[1] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase2_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:2], rmse_results[:2])
+    save_bar_graph(save_fpath + "phase3_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:2], rmse_results[:2])
     save_to_file(save_fpath + "gamma_half_data.pyc", experiment_ep_rewards)
     
     # Run Gamma Low
@@ -488,7 +488,7 @@ def phase_three():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[2] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase2_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:3], rmse_results[:3])
+    save_bar_graph(save_fpath + "phase3_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:3], rmse_results[:3])
     save_to_file(save_fpath + "gamma_low_data.pyc", experiment_ep_rewards)
 
 
@@ -502,7 +502,7 @@ def phase_three():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[3] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase2_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:4], rmse_results[:4])
+    save_bar_graph(save_fpath + "phase3_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:4], rmse_results[:4])
     save_to_file(save_fpath + "gamma_high_data.pyc", experiment_ep_rewards)
 
     return 0
@@ -517,17 +517,18 @@ def phase_three_scatter_graph():
 
     gamma_half_data = load_from_file(load_fpath + "gamma_half_data.pyc")
     gamma_low_data = load_from_file(load_fpath + "gamma_low_data.pyc")
+    gamma_high_data = load_from_file(load_fpath + "gamma_high_data.pyc")
 
     
     # Graph the data on a single graph
     # Blue - Base
     # Cyan - Gamma Half
     # Magenta - Gamma Low
-    # Yellow - Epsilon Half
-    # Black(k) - Epsilon Low
+    # Yellow - Gamma High
     graph_winloss(range(10000), base_data[0], 'b', "Base")
     graph_winloss(range(10000), gamma_half_data[0], 'c', "g=0.5")
     graph_winloss(range(10000), gamma_low_data[0], 'm', "g=0.1")
+    graph_winloss(range(10000), gamma_high_data[0], 'y', "g=0.09")
     plt.legend()
     save_graph(load_fpath + "winloss_graph.png", "Win/Loss Ratio over Episodes", "Episode", "W/L Ratio")
 
@@ -535,5 +536,4 @@ def phase_three_scatter_graph():
     return 0
 
 
-phase_three()
 phase_three_scatter_graph()
