@@ -1,6 +1,0 @@
-
-target episodes = 10000
-alpha = 1.0
-gamma = 0.5
-epsilon = 0.0
-time limit = 10000
