@@ -2,7 +2,7 @@
 #   Written by An Nguyen
 #   References "MonteCarloPrototype.py" by Trevor Maxwell
 # Purpose
-#   Performs Q learning on Frozen Lake
+#   Performs Sarsa(lambda) learning on Frozen Lake
 
 # Explanation of data structures used
 #   state is the player's position
@@ -24,6 +24,9 @@ from tqdm import tqdm
 #   3 - Up
 action_space = [0, 1, 2, 3]
 def_action_val = 0
+
+num_states = 16
+num_actions = 4
 
 
 # Given the environment and the state returned
@@ -61,32 +64,7 @@ def get_e_greedy_action(sa_values, state, epsilon):
     return get_best_action(sa_values, state)
 
 
-# Updates the state-action pair value
-def update_state_action_values(sa_values, alpha, gamma, curr_state, action, next_state, reward):
-    # Variables
-    sa_pair = (curr_state, action)
-    q_error = 0
-    q_target = 0
-
-    # Calculate how much the increment is
-    next_state_best_action = get_best_action(sa_values, next_state)
-
-    q_target = reward
-    q_target += gamma * sa_values[next_state, next_state_best_action]
-    
-    q_error = q_target - sa_values[curr_state, action]
-    #   Note: can't use sa_values directly in case
-    #       the sa_pair hasn't been met before
-
-    # Update the state-action value
-    sa_values[sa_pair] += alpha*q_error
-
-
-    return 0
-
-
-
-def run_q_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, epsilon, time_limit):
+def run_q_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, epsilon, lmbda, time_limit):
     # Create the environment
     env = gym.make("FrozenLake-v1", is_slippery=True)
     env = TimeLimit(env, max_episode_steps=time_limit)
@@ -95,27 +73,40 @@ def run_q_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, ep
     for episode in range(len(episode_rewards), target_episodes):
         # Variables
         episode_reward = 0
+        e_traces = np.zeros((num_states, num_actions))
 
         # Reset the environment
         game_state, info = env.reset()
 
         # Prime the loop
         curr_state = game_state
-        next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
+        curr_action = get_e_greedy_action(sa_values, curr_state, epsilon)
         terminated = False
         truncated  = False
 
         # Run the episode to completion
         while not (terminated or truncated):
-            # Get the next game state
-            game_state, reward, terminated, truncated, info = env.step(next_action)
+            # Apply action, get next state and reward
+            game_state, reward, terminated, truncated, info = env.step(curr_action)
             next_state = discretize_state(env, game_state)
             episode_reward += reward
 
-            # Update the state-action values
-            update_state_action_values(sa_values, alpha, gamma, curr_state, next_action, next_state, reward)
-            curr_state = next_state
+            # Get the next action
             next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
+            
+            # Calculate update value and increment eligibility trace
+            delta = reward + gamma*sa_values[(next_state, next_action)] - sa_values[(curr_state, curr_action)]
+            e_traces[(curr_state, curr_action)] += 1
+            
+            # Update values with eligibility trace and decay
+            for s in range(num_states):
+                for a in range(num_actions):
+                    sa_values[(s, a)] += alpha*sa_values[(s, a)]*e_traces[(s, a)]
+                    e_traces[(s, a)] = gamma*lmbda*e_traces[(s, a)]
+
+            # Increment forward
+            curr_state = next_state
+            curr_action = next_action
 
         episode_rewards.append(episode_reward)
 
