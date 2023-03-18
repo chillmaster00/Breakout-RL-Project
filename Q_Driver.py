@@ -216,7 +216,7 @@ def phase_one():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[0] = total_rmse/num_runs *100
     print(rmse_results)
@@ -229,7 +229,7 @@ def phase_one():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[1] = total_rmse/num_runs *100
     print(rmse_results)
@@ -242,7 +242,7 @@ def phase_one():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[2] = total_rmse/num_runs *100
     print(rmse_results)
@@ -259,7 +259,7 @@ def phase_one():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[3] = total_rmse/num_runs *100
     print(rmse_results)
@@ -272,7 +272,7 @@ def phase_one():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[4] = total_rmse/num_runs *100
     print(rmse_results)
@@ -289,7 +289,7 @@ def phase_one():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[5] = total_rmse/num_runs *100
     print(rmse_results)
@@ -302,7 +302,7 @@ def phase_one():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[6] = total_rmse/num_runs *100
     print(rmse_results)
@@ -379,7 +379,7 @@ def phase_two():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[0] = total_rmse/num_runs *100
     print(rmse_results)
@@ -393,7 +393,7 @@ def phase_two():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[1] = total_rmse/num_runs *100
     print(rmse_results)
@@ -406,7 +406,7 @@ def phase_two():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[2] = total_rmse/num_runs *100
     print(rmse_results)
@@ -423,7 +423,7 @@ def phase_two():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[3] = total_rmse/num_runs *100
     print(rmse_results)
@@ -436,7 +436,7 @@ def phase_two():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[4] = total_rmse/num_runs *100
     print(rmse_results)
@@ -504,7 +504,7 @@ def phase_three():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[0] = total_rmse/num_runs *100
     print(rmse_results)
@@ -518,7 +518,7 @@ def phase_three():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[1] = total_rmse/num_runs *100
     print(rmse_results)
@@ -531,7 +531,7 @@ def phase_three():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[2] = total_rmse/num_runs *100
     print(rmse_results)
@@ -545,7 +545,7 @@ def phase_three():
     experiment_episodal_sa_values = []
     for i in tqdm(range(30)):
         sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
-        experiment_episodal_sa_values.append(episode_rewards)
+        experiment_episodal_sa_values.append(episodal_sa_values)
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[3] = total_rmse/num_runs *100
     print(rmse_results)

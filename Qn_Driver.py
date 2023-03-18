@@ -167,6 +167,7 @@ def phase_one():
 
 
     # Run n=2 test
+    n_step = 2
     total_rmse = 0
     experiment_episodal_sa_values = []
     for i in tqdm(range(num_runs)):
@@ -180,6 +181,7 @@ def phase_one():
     
 
     # Run n=4 test
+    n_step = 4
     total_rmse = 0
     experiment_episodal_sa_values = []
     for i in tqdm(range(num_runs)):
@@ -192,6 +194,7 @@ def phase_one():
     save_to_file(save_fpath + "n=4_data.pyc", experiment_episodal_sa_values)
 
     # Run n=8 test
+    n_step = 8
     total_rmse = 0
     experiment_episodal_sa_values = []
     for i in tqdm(range(num_runs)):
