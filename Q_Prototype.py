@@ -86,10 +86,12 @@ def update_state_action_values(sa_values, alpha, gamma, curr_state, action, next
 
 
 
-def run_q_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, epsilon, time_limit):
+def run_q_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, epsilon):
     # Create the environment
     env = gym.make("FrozenLake-v1", is_slippery=True)
-    env = TimeLimit(env, max_episode_steps=time_limit)
+
+    # Variable
+    episodal_sa_values = []
 
     # Run episodes of q Learning
     for episode in range(len(episode_rewards), target_episodes):
@@ -118,7 +120,8 @@ def run_q_learning(sa_values, episode_rewards, target_episodes, alpha, gamma, ep
             next_action = get_e_greedy_action(sa_values, curr_state, epsilon)
 
         episode_rewards.append(episode_reward)
+        episodal_sa_values.append(sa_values.copy())
 
-    return sa_values, episode_rewards
+    return sa_values, episode_rewards, episodal_sa_values
 
 
