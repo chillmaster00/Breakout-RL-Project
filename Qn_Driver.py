@@ -291,5 +291,8 @@ def phase_one_scatter_graph():
 
     plt.legend()
     save_graph(fpath + "avg_episodal_rmse.png", "Average RMSE Over Episodes", "Episodes", "Average RMSError (%)")
-    
+
+    return 0
+
+phase_one()
 phase_one_scatter_graph()
