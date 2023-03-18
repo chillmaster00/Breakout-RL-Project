@@ -220,7 +220,7 @@ def phase_one():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[0] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase1_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:1], rmse_results[:1])
+    save_bar_graph(save_fpath + "phase1_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:1], rmse_results[:1])
     save_to_file(save_fpath + "base_data.pyc", experiment_episodal_sa_values)
 
     # Run alpha-half test
@@ -233,7 +233,7 @@ def phase_one():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[1] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase1_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:2], rmse_results[:2])
+    save_bar_graph(save_fpath + "phase1_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:2], rmse_results[:2])
     save_to_file(save_fpath + "alpha_half_data.pyc", experiment_episodal_sa_values)
 
     # Run alpha-low test
@@ -246,7 +246,7 @@ def phase_one():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[2] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase1_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:3], rmse_results[:3])
+    save_bar_graph(save_fpath + "phase1_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:3], rmse_results[:3])
     save_to_file(save_fpath + "alpha_low_data.pyc", experiment_episodal_sa_values)
 
     # Reset alpha
@@ -263,7 +263,7 @@ def phase_one():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[3] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase1_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:4], rmse_results[:4])
+    save_bar_graph(save_fpath + "phase1_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:4], rmse_results[:4])
     save_to_file(save_fpath + "gamma_half_data.pyc", experiment_episodal_sa_values)
     
     # Run gamma-low test
@@ -276,7 +276,7 @@ def phase_one():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[4] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase1_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:5], rmse_results[:5])
+    save_bar_graph(save_fpath + "phase1_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:5], rmse_results[:5])
     save_to_file(save_fpath + "gamma_low_data.pyc", experiment_episodal_sa_values)
     
     # Reset gamma
@@ -293,7 +293,7 @@ def phase_one():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[5] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase1_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:6], rmse_results[:6])
+    save_bar_graph(save_fpath + "phase1_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:6], rmse_results[:6])
     save_to_file(save_fpath + "epsilon_half_data.pyc", experiment_episodal_sa_values)
 
     # Run epsilon-low test
@@ -306,13 +306,13 @@ def phase_one():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[6] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase1_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:7], rmse_results[:7])
+    save_bar_graph(save_fpath + "phase1_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:7], rmse_results[:7])
     save_to_file(save_fpath + "epsilon_low_data.pyc", experiment_episodal_sa_values)
 
     # Reset epsilon
     epsilon = 0.0
 
-    save_bar_graph(save_fpath + "phase1_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests, rmse_results)
+    save_bar_graph(save_fpath + "phase1_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests, rmse_results)
 
     return 0
 
@@ -334,12 +334,12 @@ def phase_one_scatter_graph():
     graph_avg_episodal_rmse(fpath, "base_data.pyc", 30, 10000, 'b', "Base")
     
     # Alpha Graphs
-    graph_avg_episodal_rmse(fpath, "alpha_half_data.pyc", 30, 10000, 'b', "a=0.5")
+    graph_avg_episodal_rmse(fpath, "alpha_half_data.pyc", 30, 10000, 'g', "a=0.5")
     graph_avg_episodal_rmse(fpath, "alpha_low_data.pyc", 30, 10000, 'r', "a=0.1")
     
     # Gamma Graphs
-    graph_avg_episodal_rmse(fpath, "gamma_half_data.pyc", 30, 10000, 'c', "a=0.5")
-    graph_avg_episodal_rmse(fpath, "gamma_low_data.pyc", 30, 10000, 'm', "a=0.1")
+    graph_avg_episodal_rmse(fpath, "gamma_half_data.pyc", 30, 10000, 'c', "g=0.5")
+    graph_avg_episodal_rmse(fpath, "gamma_low_data.pyc", 30, 10000, 'm', "g=0.1")
 
     # Epsilon Graphs
     graph_avg_episodal_rmse(fpath, "epsilon_half_data.pyc", 30, 10000, 'y', "e=0.5")
@@ -383,7 +383,7 @@ def phase_two():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[0] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase2_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:1], rmse_results[:1])
+    save_bar_graph(save_fpath + "phase2_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:1], rmse_results[:1])
     save_to_file(save_fpath + "base_data.pyc", experiment_episodal_sa_values)
 
     
@@ -397,7 +397,7 @@ def phase_two():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[1] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase2_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:2], rmse_results[:2])
+    save_bar_graph(save_fpath + "phase2_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:2], rmse_results[:2])
     save_to_file(save_fpath + "gamma_half_data.pyc", experiment_episodal_sa_values)
     
     # Run Gamma Low
@@ -410,7 +410,7 @@ def phase_two():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[2] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase2_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:3], rmse_results[:3])
+    save_bar_graph(save_fpath + "phase2_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:3], rmse_results[:3])
     save_to_file(save_fpath + "gamma_low_data.pyc", experiment_episodal_sa_values)
 
     # Reset Gamma
@@ -427,7 +427,7 @@ def phase_two():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[3] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase2_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:4], rmse_results[:4])
+    save_bar_graph(save_fpath + "phase2_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:4], rmse_results[:4])
     save_to_file(save_fpath + "epsilon_half_data.pyc", experiment_episodal_sa_values)
     
     # Run Epsilon Low
@@ -440,7 +440,7 @@ def phase_two():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[4] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase2_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:5], rmse_results[:5])
+    save_bar_graph(save_fpath + "phase2_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:5], rmse_results[:5])
     save_to_file(save_fpath + "epsilon_low_data.pyc", experiment_episodal_sa_values)
 
 
@@ -462,8 +462,8 @@ def phase_two_scatter_graph():
     graph_avg_episodal_rmse(fpath, "base_data.pyc", 30, 10000, 'b', "Base")
     
     # Gamma Graphs
-    graph_avg_episodal_rmse(fpath, "gamma_half_data.pyc", 30, 10000, 'c', "a=0.5")
-    graph_avg_episodal_rmse(fpath, "gamma_low_data.pyc", 30, 10000, 'm', "a=0.1")
+    graph_avg_episodal_rmse(fpath, "gamma_half_data.pyc", 30, 10000, 'c', "g=0.5")
+    graph_avg_episodal_rmse(fpath, "gamma_low_data.pyc", 30, 10000, 'm', "g=0.1")
 
     # Epsilon Graphs
     graph_avg_episodal_rmse(fpath, "epsilon_half_data.pyc", 30, 10000, 'y', "e=0.5")
@@ -508,7 +508,7 @@ def phase_three():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[0] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase3_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:1], rmse_results[:1])
+    save_bar_graph(save_fpath + "phase3_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:1], rmse_results[:1])
     save_to_file(save_fpath + "base_data.pyc", experiment_episodal_sa_values)
 
     
@@ -522,7 +522,7 @@ def phase_three():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[1] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase3_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:2], rmse_results[:2])
+    save_bar_graph(save_fpath + "phase3_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:2], rmse_results[:2])
     save_to_file(save_fpath + "gamma_half_data.pyc", experiment_episodal_sa_values)
     
     # Run Gamma Low
@@ -535,7 +535,7 @@ def phase_three():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[2] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase3_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:3], rmse_results[:3])
+    save_bar_graph(save_fpath + "phase3_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:3], rmse_results[:3])
     save_to_file(save_fpath + "gamma_low_data.pyc", experiment_episodal_sa_values)
 
 
@@ -549,7 +549,7 @@ def phase_three():
         total_rmse += rmsError(optimalSA, sa_values)
     rmse_results[3] = total_rmse/num_runs *100
     print(rmse_results)
-    save_bar_graph(save_fpath + "phase3_plot.png", "RMSE for Different Paramater Values", "Paramter and Value", "RMS Error (%)", tests[:4], rmse_results[:4])
+    save_bar_graph(save_fpath + "phase3_plot.png", "Final RMSE for Different Paramater Values", "Parameter and Value", "RMS Error (%)", tests[:4], rmse_results[:4])
     save_to_file(save_fpath + "gamma_high_data.pyc", experiment_episodal_sa_values)
 
     return 0
@@ -563,28 +563,25 @@ def phase_three_scatter_graph():
     # Blue - Base
     # Cyan - Gamma Half
     # Magenta - Gamma Low
-    # Yellow - Epsilon Half
-    # Black(k) - Epsilon Low
+    # Yellow - Gamma High
 
     # Base Graph
     graph_avg_episodal_rmse(fpath, "base_data.pyc", 30, 10000, 'b', "Base")
     
     # Gamma Graphs
-    graph_avg_episodal_rmse(fpath, "gamma_half_data.pyc", 30, 10000, 'c', "a=0.5")
-    graph_avg_episodal_rmse(fpath, "gamma_low_data.pyc", 30, 10000, 'm', "a=0.1")
-
-    # Epsilon Graphs
-    graph_avg_episodal_rmse(fpath, "epsilon_half_data.pyc", 30, 10000, 'y', "e=0.5")
-    graph_avg_episodal_rmse(fpath, "epsilon_low_data.pyc", 30, 10000, 'k', "e=0.1")
+    graph_avg_episodal_rmse(fpath, "gamma_half_data.pyc", 30, 10000, 'c', "g=0.5")
+    graph_avg_episodal_rmse(fpath, "gamma_low_data.pyc", 30, 10000, 'm', "g=0.1")
+    graph_avg_episodal_rmse(fpath, "gamma_high_data.pyc", 30, 10000, 'm', "g=0.9")
 
 
     plt.legend()
     save_graph(fpath + "avg_episodal_rmse.png", "Average RMSE Over Episodes", "Episodes", "Average RMSError (%)")
     return 0
 
+
 phase_one()
-phase_two()
-phase_three()
+#phase_two()
+#phase_three()
 phase_one_scatter_graph()
-phase_two_scatter_graph()
-phase_three_scatter_graph()
+#phase_two_scatter_graph()
+#phase_three_scatter_graph()
