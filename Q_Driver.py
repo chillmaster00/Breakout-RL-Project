@@ -579,9 +579,53 @@ def phase_three_scatter_graph():
     return 0
 
 
-phase_one()
+def win_rate_phase():
+    target_episodes = 3000
+    alpha = 0.1
+    gamma = 1.0
+    epsilon = 0.1
+    num_runs = 50
+
+    t_episode_rewards = np.zeros(target_episodes)
+    t_sa_values = np.zeros((16, 4))
+    for i in tqdm(range(num_runs)):
+        sa_values, episode_rewards, episodal_sa_values = run_test(target_episodes, alpha, gamma, epsilon)
+        for ep in range(target_episodes):
+            t_episode_rewards[ep] += episode_rewards[ep]
+        for s in range(16):
+            for a in range(4):
+                t_sa_values[(s,a)] += sa_values[(s,a)]
+
+    avg_episode_rewards = np.zeros(target_episodes)
+    avg_sa_values = np.zeros((16, 4))
+    for ep in range(target_episodes):
+        avg_episode_rewards[ep] = t_episode_rewards[ep] / num_runs
+    for s in range(16):
+        for a in range(4):
+            avg_sa_values = t_sa_values / num_runs
+
+    num_bins = int(target_episodes/50)
+    avg_episode_rewards_bins = np.zeros(num_bins)
+    for i in range(num_bins):
+        for j in range(50):
+            avg_episode_rewards_bins[i] += avg_episode_rewards[i*50 + j]
+        avg_episode_rewards_bins[i] = avg_episode_rewards_bins[i] / 50
+
+
+    plt.plot(range(num_bins), avg_episode_rewards_bins)
+    save_graph("q_save_data\\q_avg_episode_rewards.png", "Average Success Rate over Episodes for Q Learning", "Episode Bins", "Average Success Rate")
+    save_to_file("q_save_data\\q_avg_sa_values.pkl", avg_sa_values)
+
+    return 0
+
+
+
+
+#phase_one()
 #phase_two()
 #phase_three()
-phase_one_scatter_graph()
+#phase_one_scatter_graph()
 #phase_two_scatter_graph()
 #phase_three_scatter_graph()
+
+win_rate_phase()
